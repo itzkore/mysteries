@@ -99,9 +99,11 @@ void VoidTextureSynthAudioProcessor::changeProgramName (int index, const juce::S
 //==============================================================================
 void VoidTextureSynthAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    juce::ignoreUnused (sampleRate, samplesPerBlock);
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    juce::ignoreUnused (samplesPerBlock);
+    currentSampleRate = static_cast<float>(sampleRate);
+    oscPhase = 0.0f;
+    oscFrequency = 220.0f; // Default test frequency (A3)
+    oscPhaseDelta = juce::MathConstants<float>::twoPi * oscFrequency / currentSampleRate;
 }
 
 void VoidTextureSynthAudioProcessor::releaseResources()
@@ -141,7 +143,20 @@ void VoidTextureSynthAudioProcessor::processBlock (juce::AudioBuffer<float>& buf
     // Clear any output channels that didn't contain input data
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
-    // TODO: Add DSP processing here
+
+    // --- Minimal oscillator engine (sine wave, mono test) ---
+    auto* left = buffer.getWritePointer(0);
+    auto numSamples = buffer.getNumSamples();
+    for (int i = 0; i < numSamples; ++i)
+    {
+        left[i] = std::sin(oscPhase);
+        oscPhase += oscPhaseDelta;
+        if (oscPhase > juce::MathConstants<float>::twoPi)
+            oscPhase -= juce::MathConstants<float>::twoPi;
+    }
+    // Copy to right channel if stereo
+    if (buffer.getNumChannels() > 1)
+        buffer.copyFrom(1, 0, buffer, 0, 0, numSamples);
 }
 
 juce::AudioProcessorEditor* VoidTextureSynthAudioProcessor::createEditor() { return new VoidTextureSynthAudioProcessorEditor(*this); }

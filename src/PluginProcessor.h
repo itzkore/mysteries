@@ -10,6 +10,11 @@ class VoidTextureSynthAudioProcessor : public juce::AudioProcessor
 public:
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     juce::AudioProcessorValueTreeState apvts;
+    // --- Minimal oscillator engine state ---
+    float currentSampleRate = 44100.0f;
+    float oscPhase = 0.0f;
+    float oscFrequency = 220.0f;
+    float oscPhaseDelta = 0.0f;
     VoidTextureSynthAudioProcessor();
     ~VoidTextureSynthAudioProcessor() override;
 
