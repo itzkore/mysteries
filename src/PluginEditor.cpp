@@ -1,5 +1,6 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
+#include <memory>
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 

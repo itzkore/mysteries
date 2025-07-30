@@ -1,3 +1,8 @@
+
+extern "C" __declspec(dllexport) juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+{
+    return new VoidTextureSynthAudioProcessor();
+}
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
@@ -5,17 +10,30 @@
 //==============================================================================
 VoidTextureSynthAudioProcessor::VoidTextureSynthAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                   #if ! JucePlugin_IsMidiEffect
-                    #if ! JucePlugin_IsSynth
-                     .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                    #endif
-                     .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-                   #endif
-                     )
+    : AudioProcessor (BusesProperties()
+        #if ! JucePlugin_IsMidiEffect
+            #if ! JucePlugin_IsSynth
+                .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+            #endif
+            .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
+        #endif
+    ),
 #endif
+    apvts(*this, nullptr, "Parameters", createParameterLayout())
 {
     // DSP engines will be initialized here once implemented
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout VoidTextureSynthAudioProcessor::createParameterLayout()
+{
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+    // Example macro parameters
+    layout.add(std::make_unique<juce::AudioParameterFloat>("MACRO1", "Macro 1", 0.0f, 1.0f, 0.5f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("MACRO2", "Macro 2", 0.0f, 1.0f, 0.5f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("MACRO3", "Macro 3", 0.0f, 1.0f, 0.5f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("MACRO4", "Macro 4", 0.0f, 1.0f, 0.5f));
+    // Add more parameters as needed
+    return layout;
 }
 
 VoidTextureSynthAudioProcessor::~VoidTextureSynthAudioProcessor() {}
@@ -137,9 +155,4 @@ bool VoidTextureSynthAudioProcessor::hasEditor() const { return true; }
 
 void VoidTextureSynthAudioProcessor::getStateInformation (juce::MemoryBlock& destData) {}
 void VoidTextureSynthAudioProcessor::setStateInformation (const void* data, int sizeInBytes) {}
-void VoidTextureSynthAudioProcessor::setStateInformation(const void*, int) {}
 
-extern "C" juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
-{
-    return new VoidTextureSynthAudioProcessor();
-}
