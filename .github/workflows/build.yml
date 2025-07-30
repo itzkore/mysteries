@@ -1,0 +1,18 @@
+name: Build
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup CMake
+      uses: jwlawson/actions-setup-cmake@v1
+    - name: Build
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release

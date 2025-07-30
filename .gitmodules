@@ -1,0 +1,4 @@
+[submodule "ext/JUCE"]
+	path = ext/JUCE
+	url = https://github.com/juce-framework/JUCE.git
+	branch = 8.0.8
