@@ -149,4 +149,3 @@ bool VoidTextureSynthAudioProcessor::hasEditor() const { return true; }
 
 void VoidTextureSynthAudioProcessor::getStateInformation (juce::MemoryBlock& destData) {}
 void VoidTextureSynthAudioProcessor::setStateInformation (const void* data, int sizeInBytes) {}
-
