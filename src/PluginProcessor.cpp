@@ -151,7 +151,9 @@ void VoidTextureSynthAudioProcessor::getStateInformation (juce::MemoryBlock& des
 void VoidTextureSynthAudioProcessor::setStateInformation (const void* data, int sizeInBytes) {}
 //==============================================================================
 // VST3 entry point
-extern "C" JUCE_API juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+//==============================================================================
+// This creates new instances of the plugin..
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new VoidTextureSynthAudioProcessor();
 }
