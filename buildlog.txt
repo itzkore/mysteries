@@ -1,0 +1,215 @@
+MSBuild verze 17.14.14+a129329f1 pro .NET Framework
+
+  Checking File Globs
+  VoidTextureSynth_rc_lib.vcxproj -> C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth_rc_lib.dir\Release\VoidTextureSynth_rc_lib.lib
+  PluginProcessor.cpp
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(1,1): error C2059: chyba syntaxe: private [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(2,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(2,21): error C2146: Chyba syntaxe: Chybí ; před identifikátorem wavetableA. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(3,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(3,20): error C2146: Chyba syntaxe: Chybí ; před identifikátorem granularB. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(4,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(4,14): error C2146: Chyba syntaxe: Chybí ; před identifikátorem reverb. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(5,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(5,13): error C2146: Chyba syntaxe: Chybí ; před identifikátorem delay. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(6,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(6,18): error C2146: Chyba syntaxe: Chybí ; před identifikátorem bitcrusher. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(18,21): error C3646: wavetableA: neznámý specifikátor override [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(18,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(19,20): error C3646: granularB: neznámý specifikátor override [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(19,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(24,14): error C3646: reverb: neznámý specifikátor override [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(24,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(25,13): error C3646: delay: neznámý specifikátor override [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(25,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(26,18): error C3646: bitcrusher: neznámý specifikátor override [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(26,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(38,48): error C2732: Specifikace propojení je v konfliktu s předchozí specifikací pro: createPluginFilter. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginProcessor.cpp)
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(38,48):
+      viz deklarace: createPluginFilter
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(13,38): error C2509: releaseResources: v: VoidTextureSynthAudioProcessor není deklarovaná členská funkce. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(13,7):
+      viz deklarace: VoidTextureSynthAudioProcessor
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(14,38): error C2509: processBlock: v: VoidTextureSynthAudioProcessor není deklarovaná členská funkce. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(13,7):
+      viz deklarace: VoidTextureSynthAudioProcessor
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(32,61): error C2509: createEditor: v: VoidTextureSynthAudioProcessor není deklarovaná členská funkce. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(13,7):
+      viz deklarace: VoidTextureSynthAudioProcessor
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(43,48): error C2732: Specifikace propojení je v konfliktu s předchozí specifikací pro: createPluginFilter. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(43,48):
+      viz deklarace: createPluginFilter
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(45,16): error C2259: VoidTextureSynthAudioProcessor: Nejde vytvořit instanci abstraktní třídy. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(13,7):
+      viz deklarace: VoidTextureSynthAudioProcessor
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(45,16):
+      kvůli následujícím členům:
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(45,16):
+      void juce::AudioProcessor::releaseResources(void): je abstraktní
+      C:\Voidwalker\VoidTextureSynth\ext\JUCE\modules\juce_audio_processors\processors\juce_AudioProcessor.h(142,18):
+      viz deklarace: juce::AudioProcessor::releaseResources
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(45,16):
+      void juce::AudioProcessor::processBlock(juce::AudioBuffer<float> &,juce::MidiBuffer &): je abstraktní
+      C:\Voidwalker\VoidTextureSynth\ext\JUCE\modules\juce_audio_processors\processors\juce_AudioProcessor.h(218,18):
+      viz deklarace: juce::AudioProcessor::processBlock
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(45,16):
+      bool juce::AudioProcessor::acceptsMidi(void) const: je abstraktní
+      C:\Voidwalker\VoidTextureSynth\ext\JUCE\modules\juce_audio_processors\processors\juce_AudioProcessor.h(861,18):
+      viz deklarace: juce::AudioProcessor::acceptsMidi
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(45,16):
+      bool juce::AudioProcessor::producesMidi(void) const: je abstraktní
+      C:\Voidwalker\VoidTextureSynth\ext\JUCE\modules\juce_audio_processors\processors\juce_AudioProcessor.h(869,18):
+      viz deklarace: juce::AudioProcessor::producesMidi
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(45,16):
+      juce::AudioProcessorEditor *juce::AudioProcessor::createEditor(void): je abstraktní
+      C:\Voidwalker\VoidTextureSynth\ext\JUCE\modules\juce_audio_processors\processors\juce_AudioProcessor.h(1019,35):
+      viz deklarace: juce::AudioProcessor::createEditor
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(45,46): error C2259: VoidTextureSynthAudioProcessor: Nejde vytvořit instanci abstraktní třídy. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(13,7):
+      viz deklarace: VoidTextureSynthAudioProcessor
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(45,46):
+      kvůli následujícím členům:
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(45,46):
+      void juce::AudioProcessor::releaseResources(void): je abstraktní
+      C:\Voidwalker\VoidTextureSynth\ext\JUCE\modules\juce_audio_processors\processors\juce_AudioProcessor.h(142,18):
+      viz deklarace: juce::AudioProcessor::releaseResources
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(45,46):
+      void juce::AudioProcessor::processBlock(juce::AudioBuffer<float> &,juce::MidiBuffer &): je abstraktní
+      C:\Voidwalker\VoidTextureSynth\ext\JUCE\modules\juce_audio_processors\processors\juce_AudioProcessor.h(218,18):
+      viz deklarace: juce::AudioProcessor::processBlock
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(45,46):
+      bool juce::AudioProcessor::acceptsMidi(void) const: je abstraktní
+      C:\Voidwalker\VoidTextureSynth\ext\JUCE\modules\juce_audio_processors\processors\juce_AudioProcessor.h(861,18):
+      viz deklarace: juce::AudioProcessor::acceptsMidi
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(45,46):
+      bool juce::AudioProcessor::producesMidi(void) const: je abstraktní
+      C:\Voidwalker\VoidTextureSynth\ext\JUCE\modules\juce_audio_processors\processors\juce_AudioProcessor.h(869,18):
+      viz deklarace: juce::AudioProcessor::producesMidi
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.cpp(45,46):
+      juce::AudioProcessorEditor *juce::AudioProcessor::createEditor(void): je abstraktní
+      C:\Voidwalker\VoidTextureSynth\ext\JUCE\modules\juce_audio_processors\processors\juce_AudioProcessor.h(1019,35):
+      viz deklarace: juce::AudioProcessor::createEditor
+  
+  PluginEditor.cpp
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(1,1): error C2059: chyba syntaxe: private [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(2,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(2,21): error C2146: Chyba syntaxe: Chybí ; před identifikátorem wavetableA. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(3,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(3,20): error C2146: Chyba syntaxe: Chybí ; před identifikátorem granularB. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(4,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(4,14): error C2146: Chyba syntaxe: Chybí ; před identifikátorem reverb. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(5,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(5,13): error C2146: Chyba syntaxe: Chybí ; před identifikátorem delay. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(6,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(6,18): error C2146: Chyba syntaxe: Chybí ; před identifikátorem bitcrusher. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(18,21): error C3646: wavetableA: neznámý specifikátor override [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(18,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(19,20): error C3646: granularB: neznámý specifikátor override [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(19,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(24,14): error C3646: reverb: neznámý specifikátor override [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(24,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(25,13): error C3646: delay: neznámý specifikátor override [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(25,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(26,18): error C3646: bitcrusher: neznámý specifikátor override [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(26,5): error C4430: Chybějící specifikátor typu – předpokládá se typ int. Poznámka: C++ nepodporuje typ default-int. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(38,48): error C2732: Specifikace propojení je v konfliktu s předchozí specifikací pro: createPluginFilter. [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+      C:\Voidwalker\VoidTextureSynth\src\PluginProcessor.h(38,48):
+      viz deklarace: createPluginFilter
+  
+C:\Voidwalker\VoidTextureSynth\src\GUI\ControlPane.h(2,10): error C1083: Nejde otevřít soubor zahrnout: JuceHeader.h: No such file or directory [C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth.vcxproj]
+  (kompilování zdrojového souboru ../src/PluginEditor.cpp)
+  
+  Generování kódu...
+  juce_vst3_helper.vcxproj -> C:\Voidwalker\VoidTextureSynth\build\Release\juce_vst3_helper.exe
