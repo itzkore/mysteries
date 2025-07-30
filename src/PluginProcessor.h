@@ -32,6 +32,26 @@ public:
 
 #ifndef JucePlugin_PreferredChannelConfigurations
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
+
+
+#pragma once
+
+#include <juce_audio_processors/juce_audio_processors.h>
+
+//==============================================================================
+class VoidTextureSynthAudioProcessor : public juce::AudioProcessor
+{
+public:
+    //==============================================================================
+    VoidTextureSynthAudioProcessor();
+    ~VoidTextureSynthAudioProcessor() override;
+
+    //==============================================================================
+    void prepareToPlay (double sampleRate, int samplesPerBlock) override;
+    void releaseResources() override;
+
+#ifndef JucePlugin_PreferredChannelConfigurations
+    bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
 #endif
 
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
@@ -61,10 +81,15 @@ public:
 
 private:
     //==============================================================================
-    WavetableEngine wavetableA;
-    GranularEngine granularB;
-    ReverbFX reverb;
-    DelayFX delay;
+    // DSP komponenty budou přidány později
+    // WavetableEngine wavetableA;
+    // GranularEngine granularB;
+    // ReverbFX reverb;
+    // DelayFX delay;
+    // BitCrusherFX bitcrusher;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VoidTextureSynthAudioProcessor)
+};
     BitCrusherFX bitcrusher;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VoidTextureSynthAudioProcessor)
