@@ -1,4 +1,5 @@
 #pragma once
+// This line is already present, so we will not add it again.
 #include <JuceHeader.h>
 class ResourceManager {
 public:

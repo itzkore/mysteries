@@ -1,5 +1,6 @@
 #include <JuceHeader.h>
 
+#include <JuceHeader.h>
 class ResourceManager {
 public:
     ResourceManager() {}

@@ -1,5 +1,6 @@
 #include <JuceHeader.h>
 
+#include <JuceHeader.h>
 class PerformanceOverlay : public juce::Component {
 public:
     PerformanceOverlay() {}

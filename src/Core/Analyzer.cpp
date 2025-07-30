@@ -1,5 +1,6 @@
 #include <JuceHeader.h>
 
+#include <JuceHeader.h>
 class FFTAnalyzer {
 public:
     FFTAnalyzer() : fft(11) {}
