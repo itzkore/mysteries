@@ -149,3 +149,9 @@ bool VoidTextureSynthAudioProcessor::hasEditor() const { return true; }
 
 void VoidTextureSynthAudioProcessor::getStateInformation (juce::MemoryBlock& destData) {}
 void VoidTextureSynthAudioProcessor::setStateInformation (const void* data, int sizeInBytes) {}
+//==============================================================================
+// VST3 entry point
+extern "C" __declspec(dllexport) juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+{
+    return new VoidTextureSynthAudioProcessor();
+}
