@@ -1,6 +1,13 @@
+//==============================================================================
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+
+void VoidTextureSynthAudioProcessor::setOscPreset(int idx)
+{
+    if (idx >= 0 && idx < (int)this->oscPresets.size())
+        this->oscPresetIndex = idx;
+}
 //==============================================================================
 VoidTextureSynthAudioProcessor::VoidTextureSynthAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -102,8 +109,23 @@ void VoidTextureSynthAudioProcessor::prepareToPlay (double sampleRate, int sampl
     juce::ignoreUnused (samplesPerBlock);
     currentSampleRate = static_cast<float>(sampleRate);
     oscPhase = 0.0f;
-    oscFrequency = 220.0f; // Default test frequency (A3)
+    oscFrequency = 220.0f;
     oscPhaseDelta = juce::MathConstants<float>::twoPi * oscFrequency / currentSampleRate;
+    midiNote = -1;
+    // 10 example oscillator presets
+    oscPresets = {
+        {"Init Sine", 0, 0.0f, 0.8f},
+        {"Fat Saw", 1, 0.05f, 0.7f},
+        {"Dark Pulse", 2, 0.0f, 0.6f},
+        {"Triangle Soft", 3, 0.0f, 0.8f},
+        {"Bright Saw", 1, 0.12f, 0.9f},
+        {"Square Hollow", 2, 0.0f, 0.5f},
+        {"Sub Sine", 0, 0.0f, 1.0f},
+        {"Detuned Saw", 1, 0.18f, 0.7f},
+        {"Pulse Wide", 2, 0.0f, 0.8f},
+        {"Triangle Thin", 3, 0.0f, 0.6f}
+    };
+    oscPresetIndex = 0;
 }
 
 void VoidTextureSynthAudioProcessor::releaseResources()
@@ -135,24 +157,57 @@ bool VoidTextureSynthAudioProcessor::isBusesLayoutSupported (const BusesLayout& 
 
 void VoidTextureSynthAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    juce::ignoreUnused (midiMessages);
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+
+    // MIDI note handling
+    for (const auto meta : midiMessages)
+    {
+        const auto msg = meta.getMessage();
+        if (msg.isNoteOn())
+        {
+            midiNote = msg.getNoteNumber();
+            oscPhase = 0.0f;
+        }
+        else if (msg.isNoteOff())
+        {
+            if (msg.getNoteNumber() == midiNote)
+                midiNote = -1;
+        }
+    }
 
     // Clear any output channels that didn't contain input data
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // --- Minimal oscillator engine (sine wave, mono test) ---
+    // --- Oscillator engine with presets and MIDI ---
     auto* left = buffer.getWritePointer(0);
     auto numSamples = buffer.getNumSamples();
+    float gain = oscPresets[oscPresetIndex].gain;
+    float detune = oscPresets[oscPresetIndex].detune;
+    int waveform = (int)oscPresets[oscPresetIndex].waveform;
+    float freq = midiNote >= 0 ? juce::MidiMessage::getMidiNoteInHertz(midiNote) * (1.0f + detune) : 0.0f;
+    oscPhaseDelta = freq > 0.0f ? juce::MathConstants<float>::twoPi * freq / currentSampleRate : 0.0f;
     for (int i = 0; i < numSamples; ++i)
     {
-        left[i] = std::sin(oscPhase);
-        oscPhase += oscPhaseDelta;
-        if (oscPhase > juce::MathConstants<float>::twoPi)
-            oscPhase -= juce::MathConstants<float>::twoPi;
+        float sample = 0.0f;
+        if (midiNote >= 0)
+        {
+            switch (waveform)
+            {
+                case 0: sample = std::sin(oscPhase); break; // Sine
+                case 1: sample = oscPhase < juce::MathConstants<float>::pi ? -1.0f + 2.0f * oscPhase / juce::MathConstants<float>::pi : 3.0f - 2.0f * oscPhase / juce::MathConstants<float>::pi; break; // Saw
+                case 2: sample = oscPhase < juce::MathConstants<float>::pi ? 1.0f : -1.0f; break; // Square
+                case 3: sample = std::abs(oscPhase / juce::MathConstants<float>::pi - 1.0f) * 2.0f - 1.0f; break; // Triangle
+                default: sample = std::sin(oscPhase); break;
+            }
+            sample *= gain;
+            oscPhase += oscPhaseDelta;
+            if (oscPhase > juce::MathConstants<float>::twoPi)
+                oscPhase -= juce::MathConstants<float>::twoPi;
+        }
+        left[i] = sample;
     }
     // Copy to right channel if stereo
     if (buffer.getNumChannels() > 1)
