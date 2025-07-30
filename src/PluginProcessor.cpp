@@ -1,4 +1,5 @@
-
+//==============================================================================
+// VST3 entry point
 extern "C" __declspec(dllexport) juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new VoidTextureSynthAudioProcessor();
