@@ -142,31 +142,40 @@ void VoidTextureSynthAudioProcessorEditor::resized()
     auto topRow = area.removeFromTop(area.getHeight() / 2);
     auto bottomRow = area;
 
-    // Engine regions
-    auto oscArea = topRow.removeFromLeft(topRow.getWidth() / 2).reduced(10);
-    if (oscDisplay) oscDisplay->setBounds(oscArea);
-    oscPresetBox.setBounds(oscArea.removeFromTop(30));
+    // --- Precise, non-overlapping layout ---
+    auto bounds = getLocalBounds();
+    const int padding = 20;
+    const int displayW = 350, displayH = 250;
+    const int controlH = 100;
+    const int macroPanelH = 120;
 
-    auto samplerArea = topRow.reduced(10);
-    if (samplerDisplay) samplerDisplay->setBounds(samplerArea);
-    samplerPresetBox.setBounds(samplerArea.removeFromTop(30));
+    // Engine A (Wavetable) display
+    juce::Rectangle<int> engineADisplayArea(padding, padding, displayW, displayH);
+    if (oscDisplay) oscDisplay->setBounds(engineADisplayArea);
 
-    auto noiseArea = bottomRow.removeFromLeft(bottomRow.getWidth() / 2).reduced(10);
-    if (noiseDisplay) noiseDisplay->setBounds(noiseArea);
+    // Engine B (Granular) display
+    juce::Rectangle<int> engineBDisplayArea(padding + displayW + padding, padding, displayW, displayH);
+    if (samplerDisplay) samplerDisplay->setBounds(engineBDisplayArea);
 
-    auto subArea = bottomRow.reduced(10);
-    if (subDisplay) subDisplay->setBounds(subArea);
+    // Engine A controls (below display)
+    juce::Rectangle<int> engineAControlsArea(engineADisplayArea.getX(), engineADisplayArea.getBottom() + padding, displayW, controlH);
+    oscPresetBox.setBounds(engineAControlsArea.removeFromTop(30));
+    // TODO: Add more controls for Engine A here
 
-    // Macro controls and mod matrix
-    macroGroup.setBounds(getWidth() - 260, 20, 240, 320);
-    modMatrixGroup.setBounds(getWidth() - 260, 360, 240, 320);
+    // Engine B controls (below display)
+    juce::Rectangle<int> engineBControlsArea(engineBDisplayArea.getX(), engineBDisplayArea.getBottom() + padding, displayW, controlH);
+    samplerPresetBox.setBounds(engineBControlsArea.removeFromTop(30));
+    // TODO: Add more controls for Engine B here
 
-    // Bypass button at right down corner
-    bypassButton.setBounds(getWidth() - 160, getHeight() - 60, 120, 40);
+    // Macro panel (bottom, full width)
+    juce::Rectangle<int> macroPanelArea(padding, bounds.getBottom() - macroPanelH - padding, bounds.getWidth() - 2 * padding, macroPanelH);
+    int knobW = 100, knobH = 100, knobSpacing = (macroPanelArea.getWidth() - 4 * knobW) / 5;
+    int knobY = macroPanelArea.getY() + (macroPanelH - knobH) / 2;
+    macroSlider1.setBounds(macroPanelArea.getX() + knobSpacing, knobY, knobW, knobH);
+    macroSlider2.setBounds(macroPanelArea.getX() + knobSpacing * 2 + knobW, knobY, knobW, knobH);
+    macroSlider3.setBounds(macroPanelArea.getX() + knobSpacing * 3 + knobW * 2, knobY, knobW, knobH);
+    macroSlider4.setBounds(macroPanelArea.getX() + knobSpacing * 4 + knobW * 3, knobY, knobW, knobH);
 
-    auto macroArea = area.removeFromTop(120);
-    macroSlider1.setBounds(macroArea.removeFromLeft(120).reduced(10));
-    macroSlider2.setBounds(macroArea.removeFromLeft(120).reduced(10));
-    macroSlider3.setBounds(macroArea.removeFromLeft(120).reduced(10));
-    macroSlider4.setBounds(macroArea.removeFromLeft(120).reduced(10));
+    // Bypass button (bottom right)
+    bypassButton.setBounds(bounds.getRight() - 160, bounds.getBottom() - 60, 120, 40);
 }

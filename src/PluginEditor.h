@@ -3,41 +3,10 @@
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "PluginProcessor.h"
+#include "GUI/MacroPanel.h"
+#include "GUI/EngineDisplay.h"
+#include "GUI/VoidLookAndFeel.h"
 
-//==============================================================================
-// EngineDisplay: Top-level component for engine visualization
-class EngineDisplay : public juce::Component, private juce::Timer {
-public:
-    EngineDisplay(const juce::String& name, VoidTextureSynthAudioProcessor* proc = nullptr)
-        : engineName(name), processor(proc) {
-        setName(name);
-        if (name == "Oscillator" && processor) startTimerHz(30);
-    }
-    void paint(juce::Graphics& g) override {
-        g.setColour(juce::Colours::white.withAlpha(0.12f));
-        g.fillRect(getLocalBounds().reduced(10));
-        g.setColour(juce::Colours::white);
-        g.drawText(engineName, getLocalBounds(), juce::Justification::centredTop);
-        if (engineName == "Oscillator" && processor) {
-            auto area = getLocalBounds().reduced(20, 40);
-            g.setColour(juce::Colours::aqua);
-            juce::Path wave;
-            int N = area.getWidth();
-            float amp = area.getHeight() / 2.0f;
-            float phase = processor->oscPhase;
-            float delta = processor->oscPhaseDelta;
-            wave.startNewSubPath(area.getX(), area.getCentreY());
-            for (int x = 0; x < N; ++x) {
-                float y = std::sin(phase + x * delta) * amp;
-                wave.lineTo(area.getX() + x, area.getCentreY() - y);
-            }
-            g.strokePath(wave, juce::PathStrokeType(2.0f));
-        }
-    }
-    void timerCallback() override { repaint(); }
-    juce::String engineName;
-    VoidTextureSynthAudioProcessor* processor = nullptr;
-};
 
 //==============================================================================
 class VoidTextureSynthAudioProcessorEditor : public juce::AudioProcessorEditor
@@ -51,6 +20,11 @@ public:
 
 
 private:
+    // Macro panel and engine display components
+    std::unique_ptr<MacroPanel> macroPanel;
+    std::unique_ptr<EngineDisplay> engineDisplay;
+    // Custom LookAndFeel
+    VoidLookAndFeel voidLookAndFeel;
     VoidTextureSynthAudioProcessor& audioProcessor;
 
     // Macro parameter sliders

@@ -20,6 +20,7 @@ juce_add_plugin(VoidTextureSynth
 target_sources(VoidTextureSynth PRIVATE
     src/PluginProcessor.cpp
     src/PluginEditor.cpp
+    src/GUI/VoidLookAndFeel.cpp
     src/DSP/VoidOscillator.cpp
     src/DSP/DarkFilter.cpp
     src/DSP/SynthVoice.cpp
@@ -48,6 +49,8 @@ target_sources(VoidTextureSynth PRIVATE
     src/Modulation/ModMatrix.h
     src/Resources/ResourceManager.cpp
     src/Resources/ResourceManager.h
+    src/GUI/MacroPanel.h
+    src/GUI/EngineDisplay.h
 )
 
 target_compile_definitions(VoidTextureSynth PUBLIC
