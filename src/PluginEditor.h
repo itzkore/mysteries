@@ -1,5 +1,3 @@
-
-
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "PluginProcessor.h"
@@ -20,22 +18,19 @@ public:
 
 
 private:
-    // Macro panel and engine display components
+    // Macro panel
     std::unique_ptr<MacroPanel> macroPanel;
-    std::unique_ptr<EngineDisplay> engineDisplay;
+    // Engine displays
+    std::unique_ptr<EngineDisplay> wavetableDisplay;
+    std::unique_ptr<EngineDisplay> granularDisplay;
+    // Tab buttons
+    juce::TextButton engineTab {"Engine"};
+    juce::TextButton fxTab {"FX"};
+    juce::TextButton modMatrixTab {"Mod Matrix"};
+    int currentTab = 0;
     // Custom LookAndFeel
     VoidLookAndFeel voidLookAndFeel;
     VoidTextureSynthAudioProcessor& audioProcessor;
-
-    // Macro parameter sliders
-    juce::Slider macroSlider1;
-    juce::Slider macroSlider2;
-    juce::Slider macroSlider3;
-    juce::Slider macroSlider4;
-
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> macroAttachment1;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> macroAttachment2;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> macroAttachment3;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> macroAttachment4;
 
     // Macro group

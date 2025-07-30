@@ -20,6 +20,8 @@ juce_add_plugin(VoidTextureSynth
 target_sources(VoidTextureSynth PRIVATE
     src/PluginProcessor.cpp
     src/PluginEditor.cpp
+    src/GUI/EngineDisplay.cpp
+    src/GUI/MacroPanel.cpp
     src/GUI/VoidLookAndFeel.cpp
     src/DSP/VoidOscillator.cpp
     src/DSP/DarkFilter.cpp
@@ -64,4 +66,5 @@ target_link_libraries(VoidTextureSynth PRIVATE
     juce::juce_gui_extra
     juce::juce_dsp
     juce::juce_audio_utils
+    juce::juce_opengl
 )

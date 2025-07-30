@@ -1,4 +1,3 @@
-
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <memory>
 #include "PluginProcessor.h"
@@ -10,15 +9,15 @@ VoidTextureSynthAudioProcessorEditor::VoidTextureSynthAudioProcessorEditor (Void
 {
     setSize (1200, 700); // Large modern UI
 
-    // Modular engine displays
-    oscDisplay = std::make_unique<EngineDisplay>("Oscillator", &audioProcessor);
-    addAndMakeVisible(*oscDisplay);
-    samplerDisplay = std::make_unique<EngineDisplay>("Sampler");
-    addAndMakeVisible(*samplerDisplay);
-    noiseDisplay = std::make_unique<EngineDisplay>("Noise");
-    addAndMakeVisible(*noiseDisplay);
-    subDisplay = std::make_unique<EngineDisplay>("Sub");
-    addAndMakeVisible(*subDisplay);
+    // Engine displays (OpenGL)
+    wavetableDisplay = std::make_unique<EngineDisplay>("WAVETABLE");
+    addAndMakeVisible(*wavetableDisplay);
+    granularDisplay = std::make_unique<EngineDisplay>("GRANULAR");
+    addAndMakeVisible(*granularDisplay);
+    
+    // Macro panel
+    macroPanel = std::make_unique<MacroPanel>();
+    addAndMakeVisible(*macroPanel);
 
     // Preset selectors
     oscPresetBox.addItem("Init", 1);
@@ -29,37 +28,11 @@ VoidTextureSynthAudioProcessorEditor::VoidTextureSynthAudioProcessorEditor (Void
     oscPresetBox.onChange = [this]() {
         audioProcessor.setOscPreset(oscPresetBox.getSelectedId() - 1);
     };
-
-    samplerPresetBox.addItem("Init", 1);
-    samplerPresetBox.addItem("Granular Pad", 2);
-    samplerPresetBox.addItem("Ghost Texture", 3);
-    samplerPresetBox.setSelectedId(1);
     addAndMakeVisible(samplerPresetBox);
 
     // Bypass button
     bypassButton.setButtonText("Bypass");
     addAndMakeVisible(bypassButton);
-
-    // Macro sliders setup
-    macroSlider1.setSliderStyle(juce::Slider::RotaryVerticalDrag);
-    macroSlider1.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
-    addAndMakeVisible(macroSlider1);
-    macroAttachment1 = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "MACRO1", macroSlider1);
-
-    macroSlider2.setSliderStyle(juce::Slider::RotaryVerticalDrag);
-    macroSlider2.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
-    addAndMakeVisible(macroSlider2);
-    macroAttachment2 = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "MACRO2", macroSlider2);
-
-    macroSlider3.setSliderStyle(juce::Slider::RotaryVerticalDrag);
-    macroSlider3.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
-    addAndMakeVisible(macroSlider3);
-    macroAttachment3 = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "MACRO3", macroSlider3);
-
-    macroSlider4.setSliderStyle(juce::Slider::RotaryVerticalDrag);
-    macroSlider4.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
-    addAndMakeVisible(macroSlider4);
-    macroAttachment4 = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "MACRO4", macroSlider4);
 
     // Macro group
     macroGroup.setText("Macro Controls");
@@ -86,26 +59,30 @@ VoidTextureSynthAudioProcessorEditor::~VoidTextureSynthAudioProcessorEditor() {}
 
 void VoidTextureSynthAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // Dark, layered background
-    g.fillAll (juce::Colour(0xFF181A20));
+    try {
+        // Dark, layered background
+        g.fillAll (juce::Colour(0xFF181A20));
 
-    // Draw section borders for engine regions
-    auto oscBounds = oscGroup.getBounds();
-    auto samplerBounds = samplerGroup.getBounds();
-    auto noiseBounds = noiseGroup.getBounds();
-    auto subBounds = subGroup.getBounds();
-    g.setColour(juce::Colour(0xFF23242A));
-    g.drawRect(oscBounds, 2);
-    g.drawRect(samplerBounds, 2);
-    g.drawRect(noiseBounds, 2);
-    g.drawRect(subBounds, 2);
+        // Draw section borders for engine regions
+        auto oscBounds = oscGroup.getBounds();
+        auto samplerBounds = samplerGroup.getBounds();
+        auto noiseBounds = noiseGroup.getBounds();
+        auto subBounds = subGroup.getBounds();
+        g.setColour(juce::Colour(0xFF23242A));
+        g.drawRect(oscBounds, 2);
+        g.drawRect(samplerBounds, 2);
+        g.drawRect(noiseBounds, 2);
+        g.drawRect(subBounds, 2);
 
-    // SVG-ready placeholders for engine displays
-    g.setColour(juce::Colours::white.withAlpha(0.08f));
-    g.fillRect(oscBounds.reduced(10));
-    g.fillRect(samplerBounds.reduced(10));
-    g.fillRect(noiseBounds.reduced(10));
-    g.fillRect(subBounds.reduced(10));
+        // SVG-ready placeholders for engine displays
+        g.setColour(juce::Colours::white.withAlpha(0.08f));
+        g.fillRect(oscBounds.reduced(10));
+        g.fillRect(samplerBounds.reduced(10));
+        g.fillRect(noiseBounds.reduced(10));
+        g.fillRect(subBounds.reduced(10));
+    } catch (...) {
+        // Prevent plugin crash from GUI exceptions
+    }
 
     // Macro controls and mod matrix backgrounds
     g.setColour(juce::Colour(0xFF23242A));
@@ -113,11 +90,6 @@ void VoidTextureSynthAudioProcessorEditor::paint (juce::Graphics& g)
     g.fillRect(modMatrixGroup.getBounds().reduced(10));
     // Layout macro sliders in macroGroup
     auto macroArea = macroGroup.getBounds().reduced(20, 40);
-    int macroSliderHeight = 40;
-    macroSlider1.setBounds(macroArea.removeFromTop(macroSliderHeight));
-    macroSlider2.setBounds(macroArea.removeFromTop(macroSliderHeight));
-    macroSlider3.setBounds(macroArea.removeFromTop(macroSliderHeight));
-    macroSlider4.setBounds(macroArea.removeFromTop(macroSliderHeight));
 
     // Layout mod matrix cells in modMatrixGroup (scaffold)
     auto modArea = modMatrixGroup.getBounds().reduced(20, 40);
@@ -151,11 +123,11 @@ void VoidTextureSynthAudioProcessorEditor::resized()
 
     // Engine A (Wavetable) display
     juce::Rectangle<int> engineADisplayArea(padding, padding, displayW, displayH);
-    if (oscDisplay) oscDisplay->setBounds(engineADisplayArea);
+    if (wavetableDisplay) wavetableDisplay->setBounds(engineADisplayArea);
 
     // Engine B (Granular) display
     juce::Rectangle<int> engineBDisplayArea(padding + displayW + padding, padding, displayW, displayH);
-    if (samplerDisplay) samplerDisplay->setBounds(engineBDisplayArea);
+    if (granularDisplay) granularDisplay->setBounds(engineBDisplayArea);
 
     // Engine A controls (below display)
     juce::Rectangle<int> engineAControlsArea(engineADisplayArea.getX(), engineADisplayArea.getBottom() + padding, displayW, controlH);
@@ -167,14 +139,16 @@ void VoidTextureSynthAudioProcessorEditor::resized()
     samplerPresetBox.setBounds(engineBControlsArea.removeFromTop(30));
     // TODO: Add more controls for Engine B here
 
+    // Macro panel (below header, above combo boxes)
+    macroPanel->setBounds(area.removeFromTop(macroPanelH).reduced(20, 0));
+    oscPresetBox.setBounds(area.removeFromTop(40).removeFromLeft(400).reduced(20, 0));
+    samplerPresetBox.setBounds(area.removeFromTop(40).removeFromLeft(400).reduced(20, 0));
+    wavetableDisplay->setBounds(20, 120, 200, 200);
+    granularDisplay->setBounds(240, 120, 200, 200);
     // Macro panel (bottom, full width)
     juce::Rectangle<int> macroPanelArea(padding, bounds.getBottom() - macroPanelH - padding, bounds.getWidth() - 2 * padding, macroPanelH);
     int knobW = 100, knobH = 100, knobSpacing = (macroPanelArea.getWidth() - 4 * knobW) / 5;
     int knobY = macroPanelArea.getY() + (macroPanelH - knobH) / 2;
-    macroSlider1.setBounds(macroPanelArea.getX() + knobSpacing, knobY, knobW, knobH);
-    macroSlider2.setBounds(macroPanelArea.getX() + knobSpacing * 2 + knobW, knobY, knobW, knobH);
-    macroSlider3.setBounds(macroPanelArea.getX() + knobSpacing * 3 + knobW * 2, knobY, knobW, knobH);
-    macroSlider4.setBounds(macroPanelArea.getX() + knobSpacing * 4 + knobW * 3, knobY, knobW, knobH);
 
     // Bypass button (bottom right)
     bypassButton.setBounds(bounds.getRight() - 160, bounds.getBottom() - 60, 120, 40);
