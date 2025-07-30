@@ -1,13 +1,6 @@
-//==============================================================================
-// VST3 entry point
-extern "C" __declspec(dllexport) juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
-{
-    return new VoidTextureSynthAudioProcessor();
-}
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-
 //==============================================================================
 VoidTextureSynthAudioProcessor::VoidTextureSynthAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
