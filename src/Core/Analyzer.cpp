@@ -1,4 +1,4 @@
-#include <JuceHeader.h>
+#include <juce_dsp/juce_dsp.h>
 
 #include <JuceHeader.h>
 class FFTAnalyzer {

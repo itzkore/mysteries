@@ -1,6 +1,6 @@
 #pragma once
 // This line is already present, so we will not add it again.
-#include <JuceHeader.h>
+#include <juce_core/juce_core.h>
 class ResourceManager {
 public:
     ResourceManager();
