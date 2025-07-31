@@ -12,11 +12,10 @@ VoidTextureSynthAudioProcessorEditor::VoidTextureSynthAudioProcessorEditor (Void
         DBG("=== Editor Constructor START ===");
     setSize (1200, 700); // Large modern UI
 
-    // Engine displays (OpenGL)
-        wavetableDisplay = std::make_unique<EngineDisplay>("WAVETABLE");
-        if (wavetableDisplay) addAndMakeVisible(*wavetableDisplay);
-        granularDisplay = std::make_unique<EngineDisplay>("GRANULAR");
-        if (granularDisplay) addAndMakeVisible(*granularDisplay);
+    // Engine displays (SynthEngine1 + APVTS)
+    oscDisplay = std::make_unique<EngineDisplay>(p.synthEngine1, p.apvts);
+    if (oscDisplay) addAndMakeVisible(*oscDisplay);
+    // Add other engine displays as needed (sampler, noise, sub)
     
     // Macro panel
         macroPanel = std::make_unique<MacroPanel>();

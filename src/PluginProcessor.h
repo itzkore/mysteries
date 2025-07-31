@@ -3,6 +3,7 @@
 
 #pragma once
 #include <juce_audio_processors/juce_audio_processors.h>
+#include "Engines/SynthEngine1.h"
 
 //==============================================================================
 class VoidTextureSynthAudioProcessor : public juce::AudioProcessor
@@ -10,6 +11,7 @@ class VoidTextureSynthAudioProcessor : public juce::AudioProcessor
 public:
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     juce::AudioProcessorValueTreeState apvts;
+    SynthEngine1 synthEngine1; // Instantiate SynthEngine1
     // --- Oscillator engine state ---
     float currentSampleRate = 44100.0f;
     float oscPhase = 0.0f;

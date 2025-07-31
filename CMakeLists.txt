@@ -1,3 +1,4 @@
+
 cmake_minimum_required(VERSION 3.22)
 project(VoidTextureSynth VERSION 1.0.0 LANGUAGES CXX)
 
@@ -28,9 +29,13 @@ juce_add_plugin(VoidTextureSynth
     VST3_CATEGORIES "Instrument|Synth"
     DEFINES "JUCE_VST3_CAN_REPLACE_VST2=0;JucePlugin_IsSynth=1;JucePlugin_WantsMidiInput=1;JucePlugin_ProducesMidiOutput=0"
 )
-
-# Source files
 target_sources(VoidTextureSynth PRIVATE
+    src/Engines/SynthEngine1.cpp
+    src/Engines/SynthEngine1.h
+    src/Synth/OscillatorLayer.cpp
+    src/Synth/SubLayer.cpp
+    src/Synth/NoiseLayer.cpp
+    src/Synth/SamplerLayer.cpp
     src/PluginProcessor.cpp
     src/PluginEditor.cpp
     src/GUI/EngineDisplay.cpp
@@ -42,10 +47,6 @@ target_sources(VoidTextureSynth PRIVATE
     src/DSP/FX/ReverbFX.h
     src/DSP/FX/DelayFX.h
     src/DSP/FX/BitCrusherFX.h
-    src/Engines/WavetableEngine.cpp
-    src/Engines/WavetableEngine.h
-    src/Engines/GranularEngine.cpp
-    src/Engines/GranularEngine.h
     src/GUI/ControlPane.cpp
     src/GUI/ControlPane.h
     src/GUI/DisplayArea.cpp
@@ -64,8 +65,6 @@ target_sources(VoidTextureSynth PRIVATE
     src/Modulation/ModMatrix.h
     src/Resources/ResourceManager.cpp
     src/Resources/ResourceManager.h
-    src/GUI/MacroPanel.h
-    src/GUI/EngineDisplay.h
 )
 
 target_compile_definitions(VoidTextureSynth PUBLIC
@@ -83,4 +82,10 @@ target_link_libraries(VoidTextureSynth PRIVATE
     juce::juce_dsp
     juce::juce_audio_utils
     juce::juce_opengl
+    juce::juce_audio_formats
+)
+
+# Ensure Source/Synth headers are available
+target_include_directories(VoidTextureSynth PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/Synth
 )

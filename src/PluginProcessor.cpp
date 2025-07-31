@@ -20,7 +20,8 @@ VoidTextureSynthAudioProcessor::VoidTextureSynthAudioProcessor()
         #endif
     ),
 #endif
-    apvts(*this, nullptr, "Parameters", createParameterLayout())
+    apvts(*this, nullptr, "Parameters", createParameterLayout()),
+    synthEngine1(apvts) // Initialize synthEngine1 with apvts
 {
     // DSP engines will be initialized here once implemented
 }
@@ -28,11 +29,22 @@ VoidTextureSynthAudioProcessor::VoidTextureSynthAudioProcessor()
 juce::AudioProcessorValueTreeState::ParameterLayout VoidTextureSynthAudioProcessor::createParameterLayout()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
-    // Example macro parameters
-    layout.add(std::make_unique<juce::AudioParameterFloat>("MACRO1", "Macro 1", 0.0f, 1.0f, 0.5f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("MACRO2", "Macro 2", 0.0f, 1.0f, 0.5f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("MACRO3", "Macro 3", 0.0f, 1.0f, 0.5f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("MACRO4", "Macro 4", 0.0f, 1.0f, 0.5f));
+    // Macro parameters
+    layout.add(std::make_unique<juce::AudioParameterFloat>("macro1", "Macro 1", 0.0f, 1.0f, 0.5f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("macro2", "Macro 2", 0.0f, 1.0f, 0.5f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("macro3", "Macro 3", 0.0f, 1.0f, 0.5f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("macro4", "Macro 4", 0.0f, 1.0f, 0.5f));
+
+    // Oscillator controls
+    layout.add(std::make_unique<juce::AudioParameterChoice>("oscWaveform", "Osc Waveform", juce::StringArray{ "Sine", "Saw", "Square" }, 0));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("oscFreq", "Osc Frequency", 20.0f, 20000.0f, 440.0f));
+
+    // Noise controls
+    layout.add(std::make_unique<juce::AudioParameterChoice>("noiseType", "Noise Type", juce::StringArray{ "White" }, 0));
+
+    // Sub controls
+    layout.add(std::make_unique<juce::AudioParameterFloat>("subFreq", "Sub Frequency", 20.0f, 200.0f, 60.0f));
+
     // Add more parameters as needed
     return layout;
 }
@@ -226,6 +238,7 @@ void VoidTextureSynthAudioProcessor::setStateInformation (const void* data, int 
 // VST3 entry point
 //==============================================================================
 // This creates new instances of the plugin..
+// Required JUCE global entry point for VST3
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new VoidTextureSynthAudioProcessor();
