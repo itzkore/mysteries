@@ -77,22 +77,28 @@ void EngineDisplay::paint(juce::Graphics& g)
 void EngineDisplay::resized()
 {
     auto area = getLocalBounds().reduced(10);
-    oscWaveformBox.setBounds(area.removeFromTop(40));
-    oscFreqSlider.setBounds(area.removeFromTop(60));
-    noiseTypeBox.setBounds(area.removeFromTop(40));
-    subFreqSlider.setBounds(area.removeFromTop(60));
+    // Top row: Oscillator and Sub controls
+    auto topRow = area.removeFromTop(60);
+    oscWaveformBox.setBounds(topRow.removeFromLeft(120).reduced(5));
+    oscFreqSlider.setBounds(topRow.removeFromLeft(180).reduced(5));
+    noiseTypeBox.setBounds(topRow.removeFromLeft(120).reduced(5));
+    subFreqSlider.setBounds(topRow.removeFromLeft(180).reduced(5));
 
-    // Macro controls
-    auto macroArea = area.removeFromTop(100);
+    // Macro knobs row
+    auto macroRow = area.removeFromTop(80);
     for (int i = 0; i < 4; ++i)
-        macroKnobs[i].setBounds(macroArea.removeFromLeft(80).reduced(5));
+        macroKnobs[i].setBounds(macroRow.removeFromLeft(80).reduced(5));
 
-    // Mod matrix
-    auto modArea = area.removeFromTop(120);
-    int btnW = 40, btnH = 30;
+    // Mod matrix grid
+    auto modMatrixArea = area.removeFromTop(120).reduced(5);
+    int btnW = modMatrixArea.getWidth() / 4;
+    int btnH = modMatrixArea.getHeight() / 4;
     for (int r = 0; r < 4; ++r)
         for (int c = 0; c < 4; ++c)
-            modMatrixButtons[r][c].setBounds(modArea.getX() + c * (btnW + 10), modArea.getY() + r * (btnH + 10), btnW, btnH);
+            modMatrixButtons[r][c].setBounds(
+                modMatrixArea.getX() + c * btnW,
+                modMatrixArea.getY() + r * btnH,
+                btnW - 6, btnH - 6);
 }
 
 void EngineDisplay::setupMacroControls()
