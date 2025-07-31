@@ -17,7 +17,7 @@ juce_add_plugin(VoidTextureSynth
     PLUGIN_MANUFACTURER_CODE "VDSY"
     PLUGIN_CODE "VDS1"
     FORMATS VST3
-    PRODUCT_NAME "Void Texture Synth"
+    PRODUCT_NAME "VoidTextureSynth"
     VST3_CATEGORIES "Instrument|Synth"
     DEFINES "JUCE_VST3_CAN_REPLACE_VST2=0;JucePlugin_IsSynth=1;JucePlugin_WantsMidiInput=1;JucePlugin_ProducesMidiOutput=0"
 )
