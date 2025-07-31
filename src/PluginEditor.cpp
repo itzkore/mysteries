@@ -9,29 +9,45 @@ VoidTextureSynthAudioProcessorEditor::VoidTextureSynthAudioProcessorEditor (Void
 {
     setSize (1200, 700); // Large modern UI
 
-    // Engine displays
+    // Add EngineDisplays and MacroPanel
     oscDisplay = std::make_unique<EngineDisplay>(p.synthEngine1, p.apvts);
+    oscDisplay->setName("Oscillator");
     addAndMakeVisible(*oscDisplay);
-    samplerDisplay = std::make_unique<EngineDisplay>(p.synthEngine1, p.apvts); // TODO: replace with sampler engine
+    samplerDisplay = std::make_unique<EngineDisplay>(p.synthEngine1, p.apvts);
+    samplerDisplay->setName("Sampler");
     addAndMakeVisible(*samplerDisplay);
-    noiseDisplay = std::make_unique<EngineDisplay>(p.synthEngine1, p.apvts); // TODO: replace with noise engine
+    noiseDisplay = std::make_unique<EngineDisplay>(p.synthEngine1, p.apvts);
+    noiseDisplay->setName("Noise");
     addAndMakeVisible(*noiseDisplay);
-    subDisplay = std::make_unique<EngineDisplay>(p.synthEngine1, p.apvts); // TODO: replace with sub engine
+    subDisplay = std::make_unique<EngineDisplay>(p.synthEngine1, p.apvts);
+    subDisplay->setName("Sub");
     addAndMakeVisible(*subDisplay);
-
-    // Macro panel
     macroPanel = std::make_unique<MacroPanel>(p.apvts);
     addAndMakeVisible(*macroPanel);
+    addAndMakeVisible(childCountLabel);
+    addAndMakeVisible(debugLabel);
 
-    // Group components for layout
-    addAndMakeVisible(macroGroup);
-    addAndMakeVisible(modMatrixGroup);
-    addAndMakeVisible(oscGroup);
-    addAndMakeVisible(samplerGroup);
-    addAndMakeVisible(noiseGroup);
-    addAndMakeVisible(subGroup);
+    // DEBUG: Add a large visible label
+    debugLabel.setText("DEBUG: PluginEditor visible", juce::dontSendNotification);
+    debugLabel.setFont(juce::Font(32.0f, juce::Font::bold));
+    debugLabel.setColour(juce::Label::textColourId, juce::Colours::red);
+    debugLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(debugLabel);
+
+    // Child count label
+    childCountLabel.setText("Children: " + juce::String(getNumChildComponents()), juce::dontSendNotification);
+    childCountLabel.setFont(juce::Font(18.0f, juce::Font::bold));
+    childCountLabel.setColour(juce::Label::textColourId, juce::Colours::orange);
+    childCountLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(childCountLabel);
 
     // Document: Custom UI logic for macro controls and mod matrix
+
+    // After all adds
+    for (int i = 0; i < getNumChildComponents(); ++i) {
+        auto* c = getChildComponent(i);
+        DBG("Child[" + juce::String(i) + "]: " + juce::String(typeid(*c).name()) + ", bounds: " + c->getBounds().toString() + ", visible: " + juce::String(c->isVisible() ? "true" : "false") + ", showing: " + juce::String(c->isShowing() ? "true" : "false"));
+    }
 }
 
 VoidTextureSynthAudioProcessorEditor::~VoidTextureSynthAudioProcessorEditor()
@@ -47,29 +63,7 @@ void VoidTextureSynthAudioProcessorEditor::paint (juce::Graphics& g)
     // Dark, layered background
     g.fillAll (juce::Colour(0xFF181A20));
 
-    // Draw section borders for engine regions
-    auto oscBounds = oscGroup.getBounds();
-    auto samplerBounds = samplerGroup.getBounds();
-    auto noiseBounds = noiseGroup.getBounds();
-    auto subBounds = subGroup.getBounds();
-    g.setColour(juce::Colour(0xFF23242A));
-    g.drawRect(oscBounds, 2);
-    g.drawRect(samplerBounds, 2);
-    g.drawRect(noiseBounds, 2);
-    g.drawRect(subBounds, 2);
 
-    // SVG-ready placeholders for engine displays
-    g.setColour(juce::Colours::white.withAlpha(0.08f));
-    g.fillRect(oscBounds.reduced(10));
-    g.fillRect(samplerBounds.reduced(10));
-    g.fillRect(noiseBounds.reduced(10));
-    g.fillRect(subBounds.reduced(10));
-
-    // Macro controls and mod matrix backgrounds
-    g.setColour(juce::Colour(0xFF23242A));
-    g.fillRect(macroGroup.getBounds().reduced(10));
-    g.fillRect(modMatrixGroup.getBounds().reduced(10));
-    // ...existing code...
 
     g.setColour (juce::Colours::cyan);
     g.setFont (24.0f);
@@ -78,33 +72,26 @@ void VoidTextureSynthAudioProcessorEditor::paint (juce::Graphics& g)
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
     g.drawFittedText ("Development Build - Core Plugin Working", getLocalBounds().removeFromBottom(40), juce::Justification::centred, 1);
+
+    // DEBUG: Draw a thick yellow border to confirm paint is called
+    g.setColour(juce::Colours::yellow);
+    g.drawRect(getLocalBounds(), 8);
 }
 
 void VoidTextureSynthAudioProcessorEditor::resized()
 {
-    auto area = getLocalBounds();
-    int margin = 20;
-    int engineHeight = 180;
-    int macroHeight = 120;
-    int modMatrixHeight = 180;
+    auto area = getLocalBounds().reduced(20);
+    int displayHeight = 80, spacing = 8;
+    int top = area.getY();
+    int left = area.getX();
+    int width = area.getWidth();
 
+    if (oscDisplay) { oscDisplay->setBounds(left, top, width, displayHeight); top += displayHeight + spacing; }
+    if (samplerDisplay) { samplerDisplay->setBounds(left, top, width, displayHeight); top += displayHeight + spacing; }
+    if (noiseDisplay) { noiseDisplay->setBounds(left, top, width, displayHeight); top += displayHeight + spacing; }
+    if (subDisplay) { subDisplay->setBounds(left, top, width, displayHeight); top += displayHeight + spacing; }
+    if (macroPanel) { macroPanel->setBounds(left, top, width, 60); top += 60 + spacing; }
 
-    // Engine region layout
-    oscGroup.setBounds(area.removeFromTop(engineHeight).reduced(margin));
-    samplerGroup.setBounds(area.removeFromTop(engineHeight).reduced(margin));
-    noiseGroup.setBounds(area.removeFromTop(engineHeight).reduced(margin));
-    subGroup.setBounds(area.removeFromTop(engineHeight).reduced(margin));
-    // Engine displays inside groups
-    if (oscDisplay != nullptr) oscDisplay->setBounds(oscGroup.getBounds().reduced(10));
-    if (samplerDisplay != nullptr) samplerDisplay->setBounds(samplerGroup.getBounds().reduced(10));
-    if (noiseDisplay != nullptr) noiseDisplay->setBounds(noiseGroup.getBounds().reduced(10));
-    if (subDisplay != nullptr) subDisplay->setBounds(subGroup.getBounds().reduced(10));
-
-    // Macro panel and group
-    macroGroup.setBounds(area.removeFromTop(macroHeight).reduced(margin));
-    if (macroPanel != nullptr) macroPanel->setBounds(macroGroup.getBounds().reduced(10));
-
-    // Mod matrix panel and group
-    modMatrixGroup.setBounds(area.removeFromTop(modMatrixHeight).reduced(margin));
-    // TODO: add modMatrixPanel->setBounds(modMatrixGroup.getBounds().reduced(10));
+    debugLabel.setBounds(10, 10, getWidth() - 20, 32);
+    childCountLabel.setBounds(10, 42, getWidth() - 20, 24);
 }

@@ -4,5 +4,10 @@
 class DisplayArea : public juce::Component {
 public:
     DisplayArea();
-    void paint(juce::Graphics& g) override;
+    void paint(juce::Graphics&) override;
+    void resized() override;
+private:
+    juce::Component waveformDisplay;
+    juce::Component spectrumDisplay;
+    juce::Component granularCloudDisplay;
 };
