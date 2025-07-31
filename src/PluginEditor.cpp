@@ -7,8 +7,9 @@
 VoidTextureSynthAudioProcessorEditor::VoidTextureSynthAudioProcessorEditor (VoidTextureSynthAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
+    DBG("=== Editor Constructor ENTRY ===");
     try {
-        DBG("Editor constructor start");
+        DBG("=== Editor Constructor START ===");
     setSize (1200, 700); // Large modern UI
 
     // Engine displays (OpenGL)
@@ -53,7 +54,7 @@ VoidTextureSynthAudioProcessorEditor::VoidTextureSynthAudioProcessorEditor (Void
         addAndMakeVisible(noiseGroup);
         subGroup.setText("Sub");
         addAndMakeVisible(subGroup);
-        DBG("Editor constructor end");
+        DBG("=== Editor Constructor END ===");
     } catch (std::exception& e) {
         DBG("Exception in Editor constructor: " << e.what());
     } catch (...) {

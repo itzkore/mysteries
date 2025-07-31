@@ -8,7 +8,7 @@
 MacroPanel::MacroPanel()
 {
     try {
-        DBG("MacroPanel constructor");
+        DBG("=== MacroPanel Constructor START ===");
         setLookAndFeel(&voidLookAndFeel);
         for (int i = 0; i < 4; ++i)
         {
@@ -19,7 +19,7 @@ MacroPanel::MacroPanel()
             macroKnobs.add(knob);
             addAndMakeVisible(knob);
         }
-        DBG("MacroPanel constructor end");
+        DBG("=== MacroPanel Constructor END ===");
     } catch (std::exception& e) {
         DBG("Exception in MacroPanel constructor: " << e.what());
     } catch (...) {
@@ -30,10 +30,12 @@ MacroPanel::MacroPanel()
 MacroPanel::~MacroPanel()
 
 {
+    DBG("=== MacroPanel Destructor START ===");
     // Remove LookAndFeel from all knobs before parent
     for (auto* knob : macroKnobs)
         knob->setLookAndFeel(nullptr);
     setLookAndFeel(nullptr);
+    DBG("=== MacroPanel Destructor END ===");
 }
 
 void MacroPanel::paint(juce::Graphics& g)

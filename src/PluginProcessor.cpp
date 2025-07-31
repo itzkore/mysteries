@@ -212,6 +212,9 @@ void VoidTextureSynthAudioProcessor::processBlock (juce::AudioBuffer<float>& buf
     // Copy to right channel if stereo
     if (buffer.getNumChannels() > 1)
         buffer.copyFrom(1, 0, buffer, 0, 0, numSamples);
+    else
+        // If mono, copy left to right channel
+        buffer.copyFrom(1, 0, buffer, 0, 0, numSamples);
 }
 
 juce::AudioProcessorEditor* VoidTextureSynthAudioProcessor::createEditor() { return new VoidTextureSynthAudioProcessorEditor(*this); }

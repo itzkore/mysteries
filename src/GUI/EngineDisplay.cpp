@@ -4,8 +4,9 @@ EngineDisplay::EngineDisplay(const juce::String& title)
     : juce::OpenGLAppComponent(), engineTitle(title)
 {
     try {
-        DBG("EngineDisplay constructor: " << title);
+        DBG("=== EngineDisplay Constructor START: " << title << " ===");
         // Attach OpenGL context if needed
+        DBG("=== EngineDisplay Constructor END: " << title << " ===");
     } catch (std::exception& e) {
         DBG("Exception in EngineDisplay constructor: " << e.what());
     } catch (...) {
@@ -16,11 +17,12 @@ EngineDisplay::EngineDisplay(const juce::String& title)
 
 EngineDisplay::~EngineDisplay()
 {
-    // Fix: Only shutdown OpenGL if context is still attached
+    DBG("=== EngineDisplay Destructor START ===");
     if (openGLContext.isAttached())
     {
         shutdownOpenGL();
     }
+    DBG("=== EngineDisplay Destructor END ===");
 }
 
 void EngineDisplay::paint(juce::Graphics& g)
