@@ -6,6 +6,10 @@ set(CMAKE_CXX_STANDARD 20)
 # JUCE submodule
 add_subdirectory(ext/JUCE)
 
+# Enable debug symbols and no optimization for Debug builds
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi /Od")
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
+
 juce_add_plugin(VoidTextureSynth
     COMPANY_NAME "Voidwalker"
     IS_SYNTH TRUE
@@ -14,6 +18,8 @@ juce_add_plugin(VoidTextureSynth
     PLUGIN_CODE "VDS1"
     FORMATS VST3
     PRODUCT_NAME "Void Texture Synth"
+    VST3_CATEGORIES "Instrument|Synth"
+    DEFINES "JUCE_VST3_CAN_REPLACE_VST2=0;JucePlugin_IsSynth=1;JucePlugin_WantsMidiInput=1;JucePlugin_ProducesMidiOutput=0"
 )
 
 # Source files
@@ -59,6 +65,9 @@ target_compile_definitions(VoidTextureSynth PUBLIC
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0
+    JucePlugin_IsSynth=1
+    JucePlugin_WantsMidiInput=1
+    JucePlugin_ProducesMidiOutput=0
 )
 
 target_link_libraries(VoidTextureSynth PRIVATE

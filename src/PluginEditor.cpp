@@ -7,50 +7,58 @@
 VoidTextureSynthAudioProcessorEditor::VoidTextureSynthAudioProcessorEditor (VoidTextureSynthAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
+    try {
+        DBG("Editor constructor start");
     setSize (1200, 700); // Large modern UI
 
     // Engine displays (OpenGL)
-    wavetableDisplay = std::make_unique<EngineDisplay>("WAVETABLE");
-    addAndMakeVisible(*wavetableDisplay);
-    granularDisplay = std::make_unique<EngineDisplay>("GRANULAR");
-    addAndMakeVisible(*granularDisplay);
+        wavetableDisplay = std::make_unique<EngineDisplay>("WAVETABLE");
+        if (wavetableDisplay) addAndMakeVisible(*wavetableDisplay);
+        granularDisplay = std::make_unique<EngineDisplay>("GRANULAR");
+        if (granularDisplay) addAndMakeVisible(*granularDisplay);
     
     // Macro panel
-    macroPanel = std::make_unique<MacroPanel>();
-    addAndMakeVisible(*macroPanel);
+        macroPanel = std::make_unique<MacroPanel>();
+        if (macroPanel) addAndMakeVisible(*macroPanel);
 
     // Preset selectors
     oscPresetBox.addItem("Init", 1);
     oscPresetBox.addItem("Fat Saw", 2);
     oscPresetBox.addItem("Dark Pulse", 3);
     oscPresetBox.setSelectedId(1);
-    addAndMakeVisible(oscPresetBox);
+        addAndMakeVisible(oscPresetBox);
     oscPresetBox.onChange = [this]() {
         audioProcessor.setOscPreset(oscPresetBox.getSelectedId() - 1);
     };
-    addAndMakeVisible(samplerPresetBox);
+        addAndMakeVisible(samplerPresetBox);
 
     // Bypass button
     bypassButton.setButtonText("Bypass");
-    addAndMakeVisible(bypassButton);
+        addAndMakeVisible(bypassButton);
 
     // Macro group
-    macroGroup.setText("Macro Controls");
-    addAndMakeVisible(macroGroup);
+        macroGroup.setText("Macro Controls");
+        addAndMakeVisible(macroGroup);
 
     // Mod matrix UI region (scaffold)
-    modMatrixGroup.setText("Modulation Matrix");
-    addAndMakeVisible(modMatrixGroup);
+        modMatrixGroup.setText("Modulation Matrix");
+        addAndMakeVisible(modMatrixGroup);
 
     // Engine region group components
-    oscGroup.setText("Oscillator");
-    addAndMakeVisible(oscGroup);
-    samplerGroup.setText("Sampler");
-    addAndMakeVisible(samplerGroup);
-    noiseGroup.setText("Noise");
-    addAndMakeVisible(noiseGroup);
-    subGroup.setText("Sub");
-    addAndMakeVisible(subGroup);
+        oscGroup.setText("Oscillator");
+        addAndMakeVisible(oscGroup);
+        samplerGroup.setText("Sampler");
+        addAndMakeVisible(samplerGroup);
+        noiseGroup.setText("Noise");
+        addAndMakeVisible(noiseGroup);
+        subGroup.setText("Sub");
+        addAndMakeVisible(subGroup);
+        DBG("Editor constructor end");
+    } catch (std::exception& e) {
+        DBG("Exception in Editor constructor: " << e.what());
+    } catch (...) {
+        DBG("Unknown exception in Editor constructor");
+    }
 
     // Document: Custom UI logic for macro controls and mod matrix
 }

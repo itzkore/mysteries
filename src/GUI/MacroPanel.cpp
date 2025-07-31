@@ -7,15 +7,23 @@
 
 MacroPanel::MacroPanel()
 {
-    setLookAndFeel(&voidLookAndFeel);
-    for (int i = 0; i < 4; ++i)
-    {
-        auto* knob = new juce::Slider();
-        knob->setSliderStyle(juce::Slider::RotaryVerticalDrag);
-        knob->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
-        knob->setName("Macro " + juce::String(i + 1));
-        macroKnobs.add(knob);
-        addAndMakeVisible(knob);
+    try {
+        DBG("MacroPanel constructor");
+        setLookAndFeel(&voidLookAndFeel);
+        for (int i = 0; i < 4; ++i)
+        {
+            auto* knob = new juce::Slider();
+            knob->setSliderStyle(juce::Slider::RotaryVerticalDrag);
+            knob->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
+            knob->setName("Macro " + juce::String(i + 1));
+            macroKnobs.add(knob);
+            addAndMakeVisible(knob);
+        }
+        DBG("MacroPanel constructor end");
+    } catch (std::exception& e) {
+        DBG("Exception in MacroPanel constructor: " << e.what());
+    } catch (...) {
+        DBG("Unknown exception in MacroPanel constructor");
     }
 }
 
@@ -28,13 +36,17 @@ MacroPanel::~MacroPanel()
 void MacroPanel::paint(juce::Graphics& g)
 {
     try {
+        DBG("MacroPanel paint");
         g.setColour(juce::Colours::darkgrey);
         g.fillRoundedRectangle(getLocalBounds().toFloat(), 16.0f);
         g.setColour(juce::Colours::cyan);
         g.setFont(18.0f);
         g.drawFittedText("MACRO PANEL", getLocalBounds().reduced(8), juce::Justification::centred, 1);
+        DBG("MacroPanel paint end");
+    } catch (std::exception& e) {
+        DBG("Exception in MacroPanel paint: " << e.what());
     } catch (...) {
-        // Prevent plugin crash from GUI exceptions
+        DBG("Unknown exception in MacroPanel paint");
     }
 }
 

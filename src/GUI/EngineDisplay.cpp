@@ -3,7 +3,14 @@
 EngineDisplay::EngineDisplay(const juce::String& title)
     : juce::OpenGLAppComponent(), engineTitle(title)
 {
-    // Attach OpenGL context if needed
+    try {
+        DBG("EngineDisplay constructor: " << title);
+        // Attach OpenGL context if needed
+    } catch (std::exception& e) {
+        DBG("Exception in EngineDisplay constructor: " << e.what());
+    } catch (...) {
+        DBG("Unknown exception in EngineDisplay constructor");
+    }
 }
 
 
@@ -14,11 +21,18 @@ EngineDisplay::~EngineDisplay()
 
 void EngineDisplay::paint(juce::Graphics& g)
 {
-    g.fillAll(juce::Colours::black.withAlpha(0.3f));
-    g.setColour(juce::Colours::cyan);
-    g.setFont(20.0f);
-    g.drawFittedText(engineTitle, getLocalBounds().removeFromTop(40), juce::Justification::centred, 1);
-    // Placeholder for waveform/starfield
+    try {
+        DBG("EngineDisplay paint: " << engineTitle);
+        g.fillAll(juce::Colours::black.withAlpha(0.3f));
+        g.setColour(juce::Colours::cyan);
+        g.setFont(20.0f);
+        g.drawFittedText(engineTitle, getLocalBounds().removeFromTop(40), juce::Justification::centred, 1);
+        // Placeholder for waveform/starfield
+    } catch (std::exception& e) {
+        DBG("Exception in EngineDisplay paint: " << e.what());
+    } catch (...) {
+        DBG("Unknown exception in EngineDisplay paint");
+    }
 }
 
 void EngineDisplay::initialise()
