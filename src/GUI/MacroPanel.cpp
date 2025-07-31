@@ -30,6 +30,9 @@ MacroPanel::MacroPanel()
 MacroPanel::~MacroPanel()
 
 {
+    // Remove LookAndFeel from all knobs before parent
+    for (auto* knob : macroKnobs)
+        knob->setLookAndFeel(nullptr);
     setLookAndFeel(nullptr);
 }
 
@@ -43,10 +46,14 @@ void MacroPanel::paint(juce::Graphics& g)
         g.setFont(18.0f);
         g.drawFittedText("MACRO PANEL", getLocalBounds().reduced(8), juce::Justification::centred, 1);
         DBG("MacroPanel paint end");
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         DBG("Exception in MacroPanel paint: " << e.what());
+        g.setColour(juce::Colours::black);
+        g.fillAll();
     } catch (...) {
         DBG("Unknown exception in MacroPanel paint");
+        g.setColour(juce::Colours::black);
+        g.fillAll();
     }
 }
 

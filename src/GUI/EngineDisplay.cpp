@@ -16,7 +16,11 @@ EngineDisplay::EngineDisplay(const juce::String& title)
 
 EngineDisplay::~EngineDisplay()
 {
-    shutdownOpenGL();
+    // Fix: Only shutdown OpenGL if context is still attached
+    if (openGLContext.isAttached())
+    {
+        shutdownOpenGL();
+    }
 }
 
 void EngineDisplay::paint(juce::Graphics& g)

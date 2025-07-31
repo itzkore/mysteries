@@ -18,6 +18,9 @@ public:
 
 
 private:
+private:
+    // Custom LookAndFeel (must be first, destroyed last)
+    VoidLookAndFeel voidLookAndFeel;
     // Macro panel
     std::unique_ptr<MacroPanel> macroPanel;
     // Engine displays
@@ -28,34 +31,25 @@ private:
     juce::TextButton fxTab {"FX"};
     juce::TextButton modMatrixTab {"Mod Matrix"};
     int currentTab = 0;
-    // Custom LookAndFeel
-    VoidLookAndFeel voidLookAndFeel;
     VoidTextureSynthAudioProcessor& audioProcessor;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> macroAttachment4;
-
     // Macro group
     juce::GroupComponent macroGroup;
-
     // Mod matrix UI region (scaffold)
     juce::GroupComponent modMatrixGroup;
-
     // --- Engine region group components ---
     juce::GroupComponent oscGroup;
     juce::GroupComponent samplerGroup;
     juce::GroupComponent noiseGroup;
     juce::GroupComponent subGroup;
-
     // --- Engine display components ---
     std::unique_ptr<EngineDisplay> oscDisplay;
     std::unique_ptr<EngineDisplay> samplerDisplay;
     std::unique_ptr<EngineDisplay> noiseDisplay;
     std::unique_ptr<EngineDisplay> subDisplay;
-
     // Preset selectors
     juce::ComboBox oscPresetBox;
     juce::ComboBox samplerPresetBox;
-
-    // Bypass button
     juce::ToggleButton bypassButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VoidTextureSynthAudioProcessorEditor)

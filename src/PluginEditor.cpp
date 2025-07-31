@@ -63,7 +63,14 @@ VoidTextureSynthAudioProcessorEditor::VoidTextureSynthAudioProcessorEditor (Void
     // Document: Custom UI logic for macro controls and mod matrix
 }
 
-VoidTextureSynthAudioProcessorEditor::~VoidTextureSynthAudioProcessorEditor() {}
+VoidTextureSynthAudioProcessorEditor::~VoidTextureSynthAudioProcessorEditor()
+{
+    DBG("=== Editor Destructor START ===");
+    wavetableDisplay.reset();
+    granularDisplay.reset();
+    macroPanel.reset();
+    DBG("=== Editor Destructor END ===");
+}
 
 void VoidTextureSynthAudioProcessorEditor::paint (juce::Graphics& g)
 {
@@ -131,33 +138,32 @@ void VoidTextureSynthAudioProcessorEditor::resized()
 
     // Engine A (Wavetable) display
     juce::Rectangle<int> engineADisplayArea(padding, padding, displayW, displayH);
-    if (wavetableDisplay) wavetableDisplay->setBounds(engineADisplayArea);
+    if (wavetableDisplay)
+        wavetableDisplay->setBounds(engineADisplayArea);
 
-    // Engine B (Granular) display
     juce::Rectangle<int> engineBDisplayArea(padding + displayW + padding, padding, displayW, displayH);
-    if (granularDisplay) granularDisplay->setBounds(engineBDisplayArea);
+    if (granularDisplay)
+        granularDisplay->setBounds(engineBDisplayArea);
 
-    // Engine A controls (below display)
     juce::Rectangle<int> engineAControlsArea(engineADisplayArea.getX(), engineADisplayArea.getBottom() + padding, displayW, controlH);
     oscPresetBox.setBounds(engineAControlsArea.removeFromTop(30));
     // TODO: Add more controls for Engine A here
 
-    // Engine B controls (below display)
     juce::Rectangle<int> engineBControlsArea(engineBDisplayArea.getX(), engineBDisplayArea.getBottom() + padding, displayW, controlH);
     samplerPresetBox.setBounds(engineBControlsArea.removeFromTop(30));
     // TODO: Add more controls for Engine B here
 
-    // Macro panel (below header, above combo boxes)
-    macroPanel->setBounds(area.removeFromTop(macroPanelH).reduced(20, 0));
+    if (macroPanel)
+        macroPanel->setBounds(area.removeFromTop(macroPanelH).reduced(20, 0));
     oscPresetBox.setBounds(area.removeFromTop(40).removeFromLeft(400).reduced(20, 0));
     samplerPresetBox.setBounds(area.removeFromTop(40).removeFromLeft(400).reduced(20, 0));
-    wavetableDisplay->setBounds(20, 120, 200, 200);
-    granularDisplay->setBounds(240, 120, 200, 200);
-    // Macro panel (bottom, full width)
+    if (wavetableDisplay)
+        wavetableDisplay->setBounds(20, 120, 200, 200);
+    if (granularDisplay)
+        granularDisplay->setBounds(240, 120, 200, 200);
     juce::Rectangle<int> macroPanelArea(padding, bounds.getBottom() - macroPanelH - padding, bounds.getWidth() - 2 * padding, macroPanelH);
     int knobW = 100, knobH = 100, knobSpacing = (macroPanelArea.getWidth() - 4 * knobW) / 5;
     int knobY = macroPanelArea.getY() + (macroPanelH - knobH) / 2;
 
-    // Bypass button (bottom right)
     bypassButton.setBounds(bounds.getRight() - 160, bounds.getBottom() - 60, 120, 40);
 }
