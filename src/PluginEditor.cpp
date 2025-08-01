@@ -428,27 +428,31 @@ void VoidTextureSynthAudioProcessorEditor::layoutMainTabWithFlexBox(juce::Rectan
     const int MARGIN = 16;
     bounds.reduce(MARGIN, MARGIN);
     
-    // Title section - fixed height
+    // STEP 1: Title section - positioned right under tabs, full width
     if (titleLabel.isVisible())
     {
-        auto titleBounds = bounds.removeFromTop(50);
-        titleLabel.setBounds(titleBounds.reduced(8));
+        auto titleBounds = bounds.removeFromTop(40); // Reduced height, moved up
+        titleLabel.setBounds(titleBounds); // Full width, no additional reducing
+        titleLabel.setJustificationType(juce::Justification::centred); // Center the text
     }
     
-    // CORRECT LAYOUT: 
-    // - Top area: Left = Synth Engine, Right = empty/future Synth 2
-    // - Bottom area: Full width FX + Macros
+    // RESTRUCTURED LAYOUT: 
+    // - Top area: Left = Synth Engine, Right = Master Controls
+    // - Bottom area: Left = FX Modules, Right = Macro Panel
     
     // Split into top and bottom sections
     auto topSection = bounds.removeFromTop(static_cast<int>(bounds.getHeight() * 0.6f));
     auto bottomSection = bounds; // Remaining height for FX + Macros
     
-    // TOP SECTION: Left = Synth 1, Right = placeholder
+    // TOP SECTION: Left = Synth 1, Right = Master Controls  
     auto synthArea = topSection.removeFromLeft(topSection.getWidth() / 2);
-    auto rightPlaceholder = topSection; // Future Synth 2 area
+    auto masterControlsArea = topSection; // Right side for master controls
     
     // Layout Synth 1 in left area (Energy orb + controls)
     layoutSynthEngineArea(synthArea);
+    
+    // Layout Master Controls in right area (relocated master volume)
+    layoutMasterControlsArea(masterControlsArea);
     
     // BOTTOM SECTION: Full width FX + Macros
     layoutBottomFXAndMacros(bottomSection);
@@ -462,26 +466,41 @@ void VoidTextureSynthAudioProcessorEditor::layoutSynthEngineArea(juce::Rectangle
     
     bounds.reduce(8, 0);
     
-    // Header with synth label and master volume
-    auto headerBounds = bounds.removeFromTop(60);
-    
-    // Synth label on left
-    auto labelBounds = headerBounds.removeFromLeft(headerBounds.getWidth() * 0.6f);
+    // STEP 2: Synth Engine header - properly centered
+    auto headerBounds = bounds.removeFromTop(50);
     if (fxLabel.isVisible())
     {
         fxLabel.setText("SYNTH ENGINE 1", juce::dontSendNotification);
-        fxLabel.setFont(juce::Font(14.0f, juce::Font::bold));
-        fxLabel.setJustificationType(juce::Justification::centredLeft);
-        fxLabel.setBounds(labelBounds.reduced(8));
+        fxLabel.setFont(juce::Font(16.0f, juce::Font::bold)); // Slightly larger
+        fxLabel.setJustificationType(juce::Justification::centred); // Center it
+        fxLabel.setBounds(headerBounds.reduced(4)); // Full width, centered
     }
     
-    // Master volume on right
+    // Visual display area (Energy orb) - takes remaining space
+    auto visualBounds = bounds;
+    layoutVisualSectionWithFlexBox(visualBounds);
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutMasterControlsArea(juce::Rectangle<int> bounds)
+{
+    // Only layout if on main tab
+    if (currentTab != 0)
+        return;
+    
+    bounds.reduce(8, 0);
+    
+    // STEP 7: Master Controls section header
+    auto headerBounds = bounds.removeFromTop(50);
+    // We can add a label here later if needed
+    
+    // STEP 3 & 7: Master volume relocated here
     if (volumeSlider.isVisible() && volumeLabel.isVisible())
     {
-        auto volumeBounds = headerBounds;
-        volumeBounds.reduce(8, 8);
+        // Center the master volume in the available space
+        auto controlArea = bounds.removeFromTop(120);
+        auto volumeBounds = controlArea.withSizeKeepingCentre(80, 100);
         
-        auto volumeKnobBounds = volumeBounds.removeFromTop(volumeBounds.getHeight() * 0.7f);
+        auto volumeKnobBounds = volumeBounds.removeFromTop(80);
         auto volumeLabelBounds = volumeBounds;
         
         volumeSlider.setBounds(volumeKnobBounds);
@@ -489,9 +508,7 @@ void VoidTextureSynthAudioProcessorEditor::layoutSynthEngineArea(juce::Rectangle
         volumeLabel.setJustificationType(juce::Justification::centred);
     }
     
-    // Visual display area (Energy orb) - takes remaining space
-    auto visualBounds = bounds;
-    layoutVisualSectionWithFlexBox(visualBounds);
+    // Remaining space can be used for additional master controls later
 }
 
 void VoidTextureSynthAudioProcessorEditor::layoutBottomFXAndMacros(juce::Rectangle<int> bounds)
@@ -503,16 +520,92 @@ void VoidTextureSynthAudioProcessorEditor::layoutBottomFXAndMacros(juce::Rectang
     // Add spacing from top section
     bounds.removeFromTop(16);
     
-    // Split horizontally: FX modules (75%) + Macros (25%)
-    auto fxBounds = bounds.removeFromLeft(static_cast<int>(bounds.getWidth() * 0.75f));
-    bounds.removeFromLeft(12); // Gap between FX and macros
+    // STEP 6 & 7: Restructured bottom layout
+    // Split horizontally: FX modules (70%) + Beautiful Macro Panel (30%)
+    auto fxBounds = bounds.removeFromLeft(static_cast<int>(bounds.getWidth() * 0.7f));
+    bounds.removeFromLeft(16); // Gap between FX and macros
     auto macroBounds = bounds;
     
-    // Layout FX section (2x2 grid spanning most of the width)
+    // Layout FX section with better organization
     layoutFXSectionWithFlexBox(fxBounds);
     
-    // Layout Macro section (vertical column on the right)
-    layoutMacroSectionWithFlexBox(macroBounds);
+    // STEP 7: Layout beautiful 4-knob macro panel (TENSION, SHADOW, GHOST, HEAT style)
+    layoutBeautifulMacroPanelWithFlexBox(macroBounds);
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutBeautifulMacroPanelWithFlexBox(juce::Rectangle<int> bounds)
+{
+    // Only layout if on main tab
+    if (currentTab != 0)
+        return;
+    
+    // STEP 7: Beautiful 4-knob macro panel design
+    bounds.reduce(8, 8);
+    
+    // Calculate dimensions for 4 horizontal knobs
+    const int KNOB_SIZE = 60;
+    const int KNOB_SPACING = 8;
+    const int LABEL_HEIGHT = 16;
+    const int VALUE_HEIGHT = 14;
+    
+    int totalWidth = (4 * KNOB_SIZE) + (3 * KNOB_SPACING);
+    int totalHeight = KNOB_SIZE + LABEL_HEIGHT + VALUE_HEIGHT + 16; // padding
+    
+    // Center the macro panel in available bounds
+    auto panelBounds = bounds.withSizeKeepingCentre(totalWidth, totalHeight);
+    
+    // Layout 4 macro controls horizontally (TENSION, SHADOW, GHOST, HEAT style)
+    for (int i = 0; i < 4; ++i)
+    {
+        int x = panelBounds.getX() + i * (KNOB_SIZE + KNOB_SPACING);
+        int y = panelBounds.getY();
+        
+        juce::Rectangle<int> knobArea(x, y + LABEL_HEIGHT, KNOB_SIZE, KNOB_SIZE);
+        juce::Rectangle<int> labelArea(x, y, KNOB_SIZE, LABEL_HEIGHT);
+        juce::Rectangle<int> valueArea(x, y + LABEL_HEIGHT + KNOB_SIZE, KNOB_SIZE, VALUE_HEIGHT);
+        
+        // For now, we'll position the existing macro sliders
+        // Later we can enhance this with proper styling
+        switch (i)
+        {
+            case 0: // TENSION
+                if (macro1Slider.isVisible())
+                {
+                    macro1Slider.setBounds(knobArea);
+                    macro1Label.setBounds(labelArea);
+                    macro1Label.setText("TENSION", juce::dontSendNotification);
+                    macro1Label.setJustificationType(juce::Justification::centred);
+                }
+                break;
+            case 1: // SHADOW  
+                if (macro2Slider.isVisible())
+                {
+                    macro2Slider.setBounds(knobArea);
+                    macro2Label.setBounds(labelArea);
+                    macro2Label.setText("SHADOW", juce::dontSendNotification);
+                    macro2Label.setJustificationType(juce::Justification::centred);
+                }
+                break;
+            case 2: // GHOST
+                if (macro3Slider.isVisible())
+                {
+                    macro3Slider.setBounds(knobArea);
+                    macro3Label.setBounds(labelArea);
+                    macro3Label.setText("GHOST", juce::dontSendNotification);
+                    macro3Label.setJustificationType(juce::Justification::centred);
+                }
+                break;
+            case 3: // HEAT
+                if (macro4Slider.isVisible())
+                {
+                    macro4Slider.setBounds(knobArea);
+                    macro4Label.setBounds(labelArea);
+                    macro4Label.setText("HEAT", juce::dontSendNotification);
+                    macro4Label.setJustificationType(juce::Justification::centred);
+                }
+                break;
+        }
+    }
 }
 
 void VoidTextureSynthAudioProcessorEditor::layoutLeftPanelWithFlexBox(juce::Rectangle<int> bounds)
@@ -571,14 +664,14 @@ void VoidTextureSynthAudioProcessorEditor::layoutVisualSectionWithFlexBox(juce::
     if (currentTab != 0)
         return;
     
-    // Center the waveform display
-    const int VISUAL_SIZE = 160;
+    // STEP 4: Center the Energy orb vertically in its box
+    const int VISUAL_SIZE = 180; // Slightly larger
     auto visualBounds = bounds.withSizeKeepingCentre(VISUAL_SIZE, VISUAL_SIZE);
     
     if (waveformDisplay && waveformDisplay->isVisible())
         waveformDisplay->setBounds(visualBounds);
     
-    // Display mode button in top-left corner
+    // Display mode button in top-left corner of the synth area
     if (displayModeButton.isVisible())
         displayModeButton.setBounds(bounds.getX() + 8, bounds.getY() + 8, 70, 24);
 }

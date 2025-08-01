@@ -47,7 +47,9 @@ private:
     void layoutWithFlexBox(juce::Rectangle<int> bounds);
     void layoutMainTabWithFlexBox(juce::Rectangle<int> bounds);
     void layoutSynthEngineArea(juce::Rectangle<int> bounds);
+    void layoutMasterControlsArea(juce::Rectangle<int> bounds);
     void layoutBottomFXAndMacros(juce::Rectangle<int> bounds);
+    void layoutBeautifulMacroPanelWithFlexBox(juce::Rectangle<int> bounds);
     void layoutLeftPanelWithFlexBox(juce::Rectangle<int> bounds);
     void layoutRightPanelWithFlexBox(juce::Rectangle<int> bounds);
     void layoutHeaderSectionWithFlexBox(juce::Rectangle<int> bounds);
