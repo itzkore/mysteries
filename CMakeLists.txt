@@ -57,6 +57,8 @@ target_sources(VoidTextureSynth PRIVATE
     src/GUI/EngineDisplay.cpp
     src/GUI/MacroPanel.cpp
     src/GUI/VoidLookAndFeel.cpp
+    src/GUI/SynthEngine1Panel.cpp
+    src/GUI/SynthEngine1Panel.h
     src/DSP/VoidOscillator.cpp
     src/DSP/DarkFilter.cpp
     src/DSP/SynthVoice.cpp

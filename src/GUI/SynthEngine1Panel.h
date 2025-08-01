@@ -1,0 +1,90 @@
+#pragma once
+#include <juce_gui_basics/juce_gui_basics.h>
+#include <juce_audio_processors/juce_audio_processors.h>
+#include "../Engines/SynthEngine1.h"
+
+class SynthEngine1Panel : public juce::Component
+{
+public:
+    SynthEngine1Panel(juce::AudioProcessorValueTreeState& apvts, SynthEngine1& engine);
+    ~SynthEngine1Panel() override;
+
+    void paint(juce::Graphics& g) override;
+    void resized() override;
+
+private:
+    juce::AudioProcessorValueTreeState& apvts;
+    SynthEngine1& synthEngine;
+    
+    // Layer Enable/Disable Toggles
+    juce::ToggleButton oscillatorEnable;
+    juce::ToggleButton subEnable;
+    juce::ToggleButton noiseEnable;
+    juce::ToggleButton samplerEnable;
+    
+    // Layer Level Controls
+    juce::Slider oscillatorLevel;
+    juce::Slider subLevel;
+    juce::Slider noiseLevel;
+    juce::Slider samplerLevel;
+    
+    // Layer Pan Controls
+    juce::Slider oscillatorPan;
+    juce::Slider subPan;
+    juce::Slider noisePan;
+    juce::Slider samplerPan;
+    
+    // Oscillator Specific Controls
+    juce::ComboBox oscillatorWaveform;
+    juce::Slider oscillatorDetune;
+    juce::Slider oscillatorOctave;
+    
+    // Sub Oscillator Controls
+    juce::Slider subOctaveOffset;
+    juce::ComboBox subWaveform;
+    
+    // Noise Controls
+    juce::ComboBox noiseType;
+    juce::Slider noiseFilterCutoff;
+    
+    // Labels for clarity
+    juce::Label sectionLabel;
+    juce::Label oscillatorLabel;
+    juce::Label subLabel;
+    juce::Label noiseLabel;
+    juce::Label samplerLabel;
+    juce::Label levelLabel;
+    juce::Label panLabel;
+    juce::Label enableLabel;
+    
+    // Parameter attachments
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> oscillatorLevelAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> subLevelAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> noiseLevelAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> samplerLevelAttachment;
+    
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> oscillatorPanAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> subPanAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> noisePanAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> samplerPanAttachment;
+    
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> oscillatorDetuneAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> oscillatorOctaveAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> subOctaveOffsetAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> noiseFilterCutoffAttachment;
+    
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> oscillatorWaveformAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> subWaveformAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> noiseTypeAttachment;
+    
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> oscillatorEnableAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> subEnableAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> noiseEnableAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> samplerEnableAttachment;
+    
+    void setupLayerControls();
+    void setupLabels();
+    void setupAttachments();
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SynthEngine1Panel)
+};

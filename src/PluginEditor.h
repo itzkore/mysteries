@@ -1,6 +1,7 @@
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "PluginProcessor.h"
+#include "GUI/SynthEngine1Panel.h"
 
 //==============================================================================
 class VoidTextureSynthAudioProcessorEditor : public juce::AudioProcessorEditor,
@@ -28,8 +29,10 @@ private:
     juce::Label titleLabel;
     juce::Slider volumeSlider;
     juce::Label volumeLabel;
-    juce::Label synth1Label;
     juce::Label synth2Label;
+    
+    // Advanced panels
+    std::unique_ptr<SynthEngine1Panel> synthEngine1Panel;
     
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> volumeAttachment;
     

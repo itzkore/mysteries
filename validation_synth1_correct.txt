@@ -1,0 +1,16 @@
+Started validating: C:\Voidwalker\VoidTextureSynth\VoidTextureSynth\build\VoidTextureSynth_artefacts\Debug\VST3\VoidTextureSynth.vst3
+Random seed: 0x3378049
+Validation started
+Strictness level: 10
+-----------------------------------------------------------------
+Starting tests in: pluginval / Scan for plugins located in: C:\Voidwalker\VoidTextureSynth\VoidTextureSynth\build\VoidTextureSynth_artefacts\Debug\VST3\VoidTextureSynth.vst3...
+error: failed to open file C:/Voidwalker/VoidTextureSynth/VoidTextureSynth/build/VoidTextureSynth_artefacts/Debug/VST3/VoidTextureSynth.vst3/manifest.ttl (No such file or directory)
+lilv_world_load_file(): error: Error loading file `file:///C:/Voidwalker/VoidTextureSynth/VoidTextureSynth/build/VoidTextureSynth_artefacts/Debug/VST3/VoidTextureSynth.vst3/manifest.ttl'
+lilv_world_load_bundle(): error: Error reading file:///C:/Voidwalker/VoidTextureSynth/VoidTextureSynth/build/VoidTextureSynth_artefacts/Debug/VST3/VoidTextureSynth.vst3/manifest.ttl
+Num plugins found: 0
+!!! Test 1 failed: No types found. This usually means the plugin binary is missing or damaged, an incompatible format or that it is an AU that isn't found by macOS so can't be created.
+There was no plugin file found at: C:\Voidwalker\VoidTextureSynth\VoidTextureSynth\build\VoidTextureSynth_artefacts\Debug\VST3\VoidTextureSynth.vst3
+FAILED!!  1 test failed, out of a total of 1
+FAILURE
+*** FAILED
+

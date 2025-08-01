@@ -23,6 +23,10 @@ VoidTextureSynthAudioProcessorEditor::VoidTextureSynthAudioProcessorEditor (Void
     // Setup content area
     addAndMakeVisible(contentArea);
     
+    // Create SynthEngine1Panel
+    synthEngine1Panel = std::make_unique<SynthEngine1Panel>(audioProcessor.apvts, audioProcessor.synthEngine1);
+    contentArea.addAndMakeVisible(*synthEngine1Panel);
+    
     // Setup main controls
     titleLabel.setText("VoidTextureSynth", juce::dontSendNotification);
     titleLabel.setFont(juce::Font(28.0f, juce::Font::bold));
@@ -50,13 +54,7 @@ VoidTextureSynthAudioProcessorEditor::VoidTextureSynthAudioProcessorEditor (Void
     volumeLabel.setJustificationType(juce::Justification::centred);
     contentArea.addAndMakeVisible(volumeLabel);
     
-    // Setup synth labels
-    synth1Label.setText("SYNTH ENGINE 1\n\nAdvanced Configuration\nComing Soon...", juce::dontSendNotification);
-    synth1Label.setFont(juce::Font(18.0f));
-    synth1Label.setColour(juce::Label::textColourId, juce::Colours::white);
-    synth1Label.setJustificationType(juce::Justification::centred);
-    contentArea.addAndMakeVisible(synth1Label);
-    
+    // Setup synth2 label (placeholder for future)
     synth2Label.setText("SYNTH ENGINE 2\n\nReserved for Future Expansion", juce::dontSendNotification);
     synth2Label.setFont(juce::Font(16.0f));
     synth2Label.setColour(juce::Label::textColourId, juce::Colour(0xFF888888));
@@ -89,7 +87,7 @@ void VoidTextureSynthAudioProcessorEditor::updateTabVisibility()
     titleLabel.setVisible(false);
     volumeSlider.setVisible(false);
     volumeLabel.setVisible(false);
-    synth1Label.setVisible(false);
+    synthEngine1Panel->setVisible(false);
     synth2Label.setVisible(false);
     
     // Show content for current tab
@@ -101,7 +99,7 @@ void VoidTextureSynthAudioProcessorEditor::updateTabVisibility()
             volumeLabel.setVisible(true);
             break;
         case 1: // Synth 1
-            synth1Label.setVisible(true);
+            synthEngine1Panel->setVisible(true);
             break;
         case 2: // Synth 2
             synth2Label.setVisible(true);
@@ -142,7 +140,7 @@ void VoidTextureSynthAudioProcessorEditor::resized()
     }
     else if (currentTab == 1) // Synth 1
     {
-        synth1Label.setBounds(bounds);
+        synthEngine1Panel->setBounds(bounds);
     }
     else if (currentTab == 2) // Synth 2
     {
