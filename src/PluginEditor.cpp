@@ -213,33 +213,49 @@ void VoidTextureSynthAudioProcessorEditor::updateTabVisibility()
         // VALIDATION MODE: Only show basic components
         titleLabel.setVisible(true);
         volumeSlider.setVisible(true);
+        
+        // Hide all other components
+        volumeLabel.setVisible(false);
+        if (waveformDisplay)
+            waveformDisplay->setVisible(false);
+        displayModeButton.setVisible(false);
+        if (synthEngine1Panel)
+            synthEngine1Panel->setVisible(false);
+        synth2Label.setVisible(false);
+        fxLabel.setVisible(false);
+        fxHeaderLabel.setVisible(false);
+        setFXControlsVisible(false);
         return;
     }
     
-    // NORMAL MODE: Hide all content first
+    // NORMAL MODE: Hide ALL content first to prevent overlapping
     titleLabel.setVisible(false);
     volumeSlider.setVisible(false);
     volumeLabel.setVisible(false);
     if (waveformDisplay)
         waveformDisplay->setVisible(false);
     displayModeButton.setVisible(false);
+    
+    // Hide Synth 1 panel completely
     if (synthEngine1Panel)
-    {
         synthEngine1Panel->setVisible(false);
-        // Hide any panel-specific labels here
-    }
+    
+    // Hide Synth 2 content
     synth2Label.setVisible(false);
+    
+    // Hide all FX related components
     fxLabel.setVisible(false);
+    fxHeaderLabel.setVisible(false);
     reverbLabel.setVisible(false);
     delayLabel.setVisible(false);
-    
-    // Hide all FX controls
+    filterLabel.setVisible(false);
+    distortionLabel.setVisible(false);
     setFXControlsVisible(false);
     
-    // Show content for current tab
+    // Show content ONLY for current tab
     switch (currentTab)
     {
-        case 0: // Main
+        case 0: // Main Tab - Our FlexBox layout
             titleLabel.setVisible(true);
             volumeSlider.setVisible(true);
             volumeLabel.setVisible(true);
@@ -247,21 +263,25 @@ void VoidTextureSynthAudioProcessorEditor::updateTabVisibility()
                 waveformDisplay->setVisible(true);
             displayModeButton.setVisible(true);
             fxLabel.setVisible(true);
+            fxHeaderLabel.setVisible(true);
             reverbLabel.setVisible(true);
             delayLabel.setVisible(true);
+            filterLabel.setVisible(true);
+            distortionLabel.setVisible(true);
             setFXControlsVisible(true);
             break;
-        case 1: // Synth 1
+            
+        case 1: // Synth 1 Tab - Dedicated panel
             if (synthEngine1Panel)
-            {
                 synthEngine1Panel->setVisible(true);
-            }
             break;
-        case 2: // Synth 2
+            
+        case 2: // Synth 2 Tab - Simple label
             synth2Label.setVisible(true);
             break;
     }
     
+    // Force layout update
     resized();
 }
 
@@ -276,123 +296,55 @@ void VoidTextureSynthAudioProcessorEditor::paint (juce::Graphics& g)
         auto bounds = getLocalBounds();
         auto contentBounds = bounds;
         contentBounds.removeFromTop(100); // Skip title and tabs
+        contentBounds.reduce(16, 16);
         
-        // Draw section backgrounds with subtle borders
-        auto leftHalf = contentBounds.removeFromLeft(contentBounds.getWidth() / 2);
-        auto rightHalf = contentBounds;
+        // CORRECT LAYOUT PAINTING:
+        // Top section: Left = Synth 1, Right = placeholder
+        auto topSection = contentBounds.removeFromTop(static_cast<int>(contentBounds.getHeight() * 0.6f));
+        auto bottomSection = contentBounds; // FX + Macros area
         
-        // Synth 1 background (left side) - dark with subtle gradient
+        // Left side - Synth Engine 1
+        auto synthArea = topSection.removeFromLeft(topSection.getWidth() / 2);
         juce::ColourGradient leftGrad(
-            juce::Colour(0xFF1E1E22), leftHalf.getX(), leftHalf.getY(),
-            juce::Colour(0xFF18181A), leftHalf.getX(), leftHalf.getBottom(),
+            juce::Colour(0xFF1E1E22), synthArea.getX(), synthArea.getY(),
+            juce::Colour(0xFF18181A), synthArea.getX(), synthArea.getBottom(),
             false);
         g.setGradientFill(leftGrad);
-        g.fillRoundedRectangle(leftHalf.reduced(5).toFloat(), 6.0f);
-        
-        // Add a glowing border with gradient
+        g.fillRoundedRectangle(synthArea.reduced(5).toFloat(), 6.0f);
         g.setColour(juce::Colour(0xFF2A5599));
-        g.drawRoundedRectangle(leftHalf.reduced(5).toFloat(), 6.0f, 1.2f);
+        g.drawRoundedRectangle(synthArea.reduced(5).toFloat(), 6.0f, 1.2f);
         
-        // Draw synth engine 1 header area
-        auto synth1HeaderArea = leftHalf.reduced(15, 15).removeFromTop(30);
-        juce::ColourGradient headerGrad(
-            juce::Colour(0xFF2A5599), synth1HeaderArea.getX(), synth1HeaderArea.getCentreY(),
-            juce::Colour(0xFF152A44), synth1HeaderArea.getRight(), synth1HeaderArea.getCentreY(),
+        // Right side placeholder
+        auto rightPlaceholder = topSection;
+        g.setColour(juce::Colour(0xFF0F0F0F));
+        g.fillRoundedRectangle(rightPlaceholder.reduced(5).toFloat(), 6.0f);
+        g.setColour(juce::Colour(0xFF333333));
+        g.drawRoundedRectangle(rightPlaceholder.reduced(5).toFloat(), 6.0f, 1.2f);
+        
+        // Bottom section - FX + Macros (full width)
+        juce::ColourGradient bottomGrad(
+            juce::Colour(0xFF1A1E22), bottomSection.getX(), bottomSection.getY(),
+            juce::Colour(0xFF151A18), bottomSection.getX(), bottomSection.getBottom(),
             false);
-        g.setGradientFill(headerGrad);
-        g.fillRoundedRectangle(synth1HeaderArea.toFloat(), 4.0f);
+        g.setGradientFill(bottomGrad);
+        g.fillRoundedRectangle(bottomSection.reduced(5).toFloat(), 6.0f);
+        g.setColour(juce::Colour(0xFF00AA44));
+        g.drawRoundedRectangle(bottomSection.reduced(5).toFloat(), 6.0f, 1.2f);
         
-        // Orb area with subtle glow
-        auto orbAreaBounds = leftHalf.reduced(15);
+        // Draw Energy orb backdrop in synth area
+        auto orbAreaBounds = synthArea.reduced(15);
         orbAreaBounds.removeFromTop(50); // Skip header
-        auto tempOrbArea = orbAreaBounds.removeFromTop(orbAreaBounds.getHeight() * 0.5);
         
-        // Centrované umístění orbu s vlastními rozměry
-        int orbWidth = std::min(orbAreaBounds.getWidth() - 40, 220);
-        int orbHeight = std::min(orbAreaBounds.getHeight() - 40, 220);
-        int orbX = tempOrbArea.getCentreX() - orbWidth/2;
-        int orbY = tempOrbArea.getCentreY() - orbHeight/2;
+        int orbWidth = std::min(orbAreaBounds.getWidth() - 40, 180);
+        int orbHeight = std::min(orbAreaBounds.getHeight() - 40, 180);
+        int orbX = orbAreaBounds.getCentreX() - orbWidth/2;
+        int orbY = orbAreaBounds.getCentreY() - orbHeight/2;
         juce::Rectangle<int> orbArea(orbX, orbY, orbWidth, orbHeight);
         
-        // Draw an elegant backdrop for the orb
         g.setColour(juce::Colour(0xFF101014));
         g.fillRoundedRectangle(orbArea.expanded(10).toFloat(), 8.0f);
         g.setColour(juce::Colour(0xFF2A2A33));
         g.drawRoundedRectangle(orbArea.expanded(10).toFloat(), 8.0f, 1.0f);
-        
-        // FX section panel 
-        auto fxSectionY = orbArea.getBottom() + 40;
-        auto fxSectionHeight = leftHalf.getBottom() - fxSectionY - 15;
-        juce::Rectangle<int> fxSectionBounds(leftHalf.getX() + 15, fxSectionY, leftHalf.getWidth() - 30, fxSectionHeight);
-        
-        // Draw FX section header with gradient
-        juce::ColourGradient fxHeaderGrad(
-            juce::Colour(0xFF2A5599), fxSectionBounds.getX(), fxSectionBounds.getY(),
-            juce::Colour(0xFF152A44), fxSectionBounds.getRight(), fxSectionBounds.getY(),
-            false);
-        g.setGradientFill(fxHeaderGrad);
-        g.fillRoundedRectangle(fxSectionBounds.removeFromTop(30).toFloat(), 4.0f);
-        
-        // Draw FX section body
-        g.setColour(juce::Colour(0xFF151518));
-        g.fillRoundedRectangle(fxSectionBounds.toFloat(), 4.0f);
-        g.setColour(juce::Colour(0xFF252530));
-        g.drawRoundedRectangle(fxSectionBounds.toFloat(), 4.0f, 1.0f);
-        
-        // Draw the 2x2 grid of FX modules
-        const int moduleWidth = (fxSectionBounds.getWidth() - 30) / 2;
-        const int moduleHeight = (fxSectionBounds.getHeight() - 20) / 2;
-        
-        juce::Rectangle<int> module1Bounds(fxSectionBounds.getX() + 10, 
-                                          fxSectionBounds.getY() + 10, 
-                                          moduleWidth, moduleHeight);
-        
-        juce::Rectangle<int> module2Bounds(module1Bounds.getRight() + 10, 
-                                          module1Bounds.getY(), 
-                                          moduleWidth, moduleHeight);
-        
-        juce::Rectangle<int> module3Bounds(module1Bounds.getX(), 
-                                          module1Bounds.getBottom() + 10, 
-                                          moduleWidth, moduleHeight);
-        
-        juce::Rectangle<int> module4Bounds(module2Bounds.getX(), 
-                                          module3Bounds.getY(), 
-                                          moduleWidth, moduleHeight);
-        
-        // Draw each module with gradient background
-        juce::String moduleNames[4] = {"REVERB", "DELAY", "FILTER", "DISTORTION"};
-        juce::Rectangle<int> moduleBounds[4] = {module1Bounds, module2Bounds, module3Bounds, module4Bounds};
-        
-        for (int i = 0; i < 4; ++i) {
-            // Module background
-            juce::ColourGradient moduleGrad(
-                juce::Colour(0xFF1A1A20), moduleBounds[i].getX(), moduleBounds[i].getY(),
-                juce::Colour(0xFF151518), moduleBounds[i].getX(), moduleBounds[i].getBottom(),
-                false);
-            g.setGradientFill(moduleGrad);
-            g.fillRoundedRectangle(moduleBounds[i].toFloat(), 3.0f);
-            
-            // Module border
-            g.setColour(juce::Colour(0xFF2A2A33));
-            g.drawRoundedRectangle(moduleBounds[i].toFloat(), 3.0f, 1.0f);
-            
-            // Module header (smaller for compact layout)
-            g.setFont(juce::Font(12.0f, juce::Font::bold));
-            g.setColour(juce::Colours::white);
-            g.drawText(moduleNames[i], moduleBounds[i].removeFromTop(18), juce::Justification::centred, true);
-        }
-        
-        // Synth 2 background (right side)
-        juce::ColourGradient rightGrad(
-            juce::Colour(0xFF1A1A1C), rightHalf.getX(), rightHalf.getY(),
-            juce::Colour(0xFF131315), rightHalf.getX(), rightHalf.getBottom(),
-            false);
-        g.setGradientFill(rightGrad);
-        g.fillRoundedRectangle(rightHalf.reduced(5).toFloat(), 6.0f);
-        
-        // Green accent border for Synth 2
-        g.setColour(juce::Colour(0xFF00AA44));
-        g.drawRoundedRectangle(rightHalf.reduced(5).toFloat(), 6.0f, 1.2f);
     }
 }
 
@@ -400,70 +352,374 @@ void VoidTextureSynthAudioProcessorEditor::resized()
 {
     auto bounds = getLocalBounds();
     
+    // Validation safety check - bounds must be valid
+    if (bounds.isEmpty() || bounds.getWidth() < 50 || bounds.getHeight() < 50)
+        return;
+    
     // Check if we're in validation mode
     auto processName = juce::File::getSpecialLocation(juce::File::currentExecutableFile).getFileNameWithoutExtension().toLowerCase();
     bool isValidationEnvironment = processName.contains("pluginval") || processName.contains("validator");
     
     if (isValidationEnvironment)
     {
-        // VALIDATION MODE: Simple layout
+        // VALIDATION MODE: Ultra-safe simple layout
         contentArea.setBounds(bounds);
         titleLabel.setBounds(bounds.removeFromTop(100).reduced(20));
         volumeSlider.setBounds(bounds.removeFromTop(50).reduced(50));
         return;
     }
     
-    // NORMAL MODE: Full layout with professional precision
+    // NORMAL MODE: Professional FlexBox layout system
+    layoutWithFlexBox(bounds);
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutWithFlexBox(juce::Rectangle<int> bounds)
+{
+    // Main layout FlexBox container - vertical stack
+    juce::FlexBox mainLayout;
+    mainLayout.flexDirection = juce::FlexBox::Direction::column;
+    mainLayout.justifyContent = juce::FlexBox::JustifyContent::flexStart;
+    mainLayout.alignItems = juce::FlexBox::AlignItems::stretch;
     
-    // Tab buttons at top - precisely positioned
-    auto tabArea = bounds.removeFromTop(40);
-    auto buttonWidth = tabArea.getWidth() / 3;
-    mainTabButton.setBounds(0, 0, buttonWidth, 40);
-    synth1TabButton.setBounds(buttonWidth, 0, buttonWidth, 40);
-    synth2TabButton.setBounds(buttonWidth * 2, 0, buttonWidth, 40);
+    // Header section (tabs) - fixed height
+    juce::FlexBox headerLayout;
+    headerLayout.flexDirection = juce::FlexBox::Direction::row;
+    headerLayout.justifyContent = juce::FlexBox::JustifyContent::spaceBetween;
+    headerLayout.alignItems = juce::FlexBox::AlignItems::stretch;
     
-    // Content area
-    contentArea.setBounds(bounds);
+    headerLayout.items.add(juce::FlexItem(mainTabButton).withFlex(1.0f).withMargin(2));
+    headerLayout.items.add(juce::FlexItem(synth1TabButton).withFlex(1.0f).withMargin(2));
+    headerLayout.items.add(juce::FlexItem(synth2TabButton).withFlex(1.0f).withMargin(2));
+    
+    // Content area - flexible height
+    auto contentBounds = bounds;
+    auto headerArea = contentBounds.removeFromTop(44);
+    headerLayout.performLayout(headerArea);
+    
+    // Set content area bounds
+    contentArea.setBounds(contentBounds);
     
     // Layout content based on current tab
-    if (currentTab == 0) // Main tab - Professional layout rework
+    switch (currentTab)
     {
-        layoutMainTab(bounds);
-    }
-    else if (currentTab == 1) // Synth 1 tab
-    {
-        if (synthEngine1Panel) {
-            synthEngine1Panel->setBounds(bounds);
-        }
-    }
-    else if (currentTab == 2) // Synth 2
-    {
-        // Show only synth 2 label
-        synth2Label.setBounds(bounds);
+        case 0: // Main tab - Use FlexBox layout
+            layoutMainTabWithFlexBox(contentBounds);
+            break;
+        case 1: // Synth 1 tab - Dedicated panel only
+            if (synthEngine1Panel && synthEngine1Panel->isVisible()) {
+                synthEngine1Panel->setBounds(contentBounds.reduced(16));
+            }
+            break;
+        case 2: // Synth 2 tab - Simple label only
+            if (synth2Label.isVisible()) {
+                synth2Label.setBounds(contentBounds.reduced(16));
+            }
+            break;
     }
 }
 
-void VoidTextureSynthAudioProcessorEditor::layoutMainTab(juce::Rectangle<int> bounds)
+void VoidTextureSynthAudioProcessorEditor::layoutMainTabWithFlexBox(juce::Rectangle<int> bounds)
 {
-    // Professional main tab layout with clear separation of concerns
+    // Only layout if we're on the main tab
+    if (currentTab != 0)
+        return;
+        
+    // Apply consistent margin to entire layout
+    const int MARGIN = 16;
+    bounds.reduce(MARGIN, MARGIN);
     
-    // Top title area with consistent spacing
-    auto titleArea = bounds.removeFromTop(60);
-    titleLabel.setBounds(titleArea.reduced(30, 10));
+    // Title section - fixed height
+    if (titleLabel.isVisible())
+    {
+        auto titleBounds = bounds.removeFromTop(50);
+        titleLabel.setBounds(titleBounds.reduced(8));
+    }
     
-    // Create two clean halves for dual-synth layout
-    auto leftHalf = bounds.removeFromLeft(bounds.getWidth() / 2);
-    auto rightHalf = bounds;
+    // CORRECT LAYOUT: 
+    // - Top area: Left = Synth Engine, Right = empty/future Synth 2
+    // - Bottom area: Full width FX + Macros
     
-    // Add professional margins
-    leftHalf = leftHalf.reduced(15, 10);
-    rightHalf = rightHalf.reduced(15, 10);
+    // Split into top and bottom sections
+    auto topSection = bounds.removeFromTop(static_cast<int>(bounds.getHeight() * 0.6f));
+    auto bottomSection = bounds; // Remaining height for FX + Macros
     
-    // === LEFT HALF: SYNTH 1 SECTION ===
-    layoutSynth1Section(leftHalf);
+    // TOP SECTION: Left = Synth 1, Right = placeholder
+    auto synthArea = topSection.removeFromLeft(topSection.getWidth() / 2);
+    auto rightPlaceholder = topSection; // Future Synth 2 area
     
-    // === RIGHT HALF: SYNTH 2 PLACEHOLDER ===
-    synth2Label.setBounds(rightHalf.reduced(20));
+    // Layout Synth 1 in left area (Energy orb + controls)
+    layoutSynthEngineArea(synthArea);
+    
+    // BOTTOM SECTION: Full width FX + Macros
+    layoutBottomFXAndMacros(bottomSection);
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutSynthEngineArea(juce::Rectangle<int> bounds)
+{
+    // Only layout if on main tab and components are visible
+    if (currentTab != 0)
+        return;
+    
+    bounds.reduce(8, 0);
+    
+    // Header with synth label and master volume
+    auto headerBounds = bounds.removeFromTop(60);
+    
+    // Synth label on left
+    auto labelBounds = headerBounds.removeFromLeft(headerBounds.getWidth() * 0.6f);
+    if (fxLabel.isVisible())
+    {
+        fxLabel.setText("SYNTH ENGINE 1", juce::dontSendNotification);
+        fxLabel.setFont(juce::Font(14.0f, juce::Font::bold));
+        fxLabel.setJustificationType(juce::Justification::centredLeft);
+        fxLabel.setBounds(labelBounds.reduced(8));
+    }
+    
+    // Master volume on right
+    if (volumeSlider.isVisible() && volumeLabel.isVisible())
+    {
+        auto volumeBounds = headerBounds;
+        volumeBounds.reduce(8, 8);
+        
+        auto volumeKnobBounds = volumeBounds.removeFromTop(volumeBounds.getHeight() * 0.7f);
+        auto volumeLabelBounds = volumeBounds;
+        
+        volumeSlider.setBounds(volumeKnobBounds);
+        volumeLabel.setBounds(volumeLabelBounds);
+        volumeLabel.setJustificationType(juce::Justification::centred);
+    }
+    
+    // Visual display area (Energy orb) - takes remaining space
+    auto visualBounds = bounds;
+    layoutVisualSectionWithFlexBox(visualBounds);
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutBottomFXAndMacros(juce::Rectangle<int> bounds)
+{
+    // Only layout if on main tab
+    if (currentTab != 0)
+        return;
+    
+    // Add spacing from top section
+    bounds.removeFromTop(16);
+    
+    // Split horizontally: FX modules (75%) + Macros (25%)
+    auto fxBounds = bounds.removeFromLeft(static_cast<int>(bounds.getWidth() * 0.75f));
+    bounds.removeFromLeft(12); // Gap between FX and macros
+    auto macroBounds = bounds;
+    
+    // Layout FX section (2x2 grid spanning most of the width)
+    layoutFXSectionWithFlexBox(fxBounds);
+    
+    // Layout Macro section (vertical column on the right)
+    layoutMacroSectionWithFlexBox(macroBounds);
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutLeftPanelWithFlexBox(juce::Rectangle<int> bounds)
+{
+    // Only layout if components are visible
+    if (currentTab != 0)
+        return;
+    
+    // Header with master volume
+    auto headerBounds = bounds.removeFromTop(60);
+    layoutHeaderSectionWithFlexBox(headerBounds);
+    
+    // Visual display area (Energy orb) - this should be the main content
+    auto visualBounds = bounds.removeFromTop(240);
+    layoutVisualSectionWithFlexBox(visualBounds);
+    
+    // NO FX modules on the left side - that's for the right panel!
+    // Remaining space can be used for synth-specific controls later
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutHeaderSectionWithFlexBox(juce::Rectangle<int> bounds)
+{
+    // Only layout visible components
+    if (currentTab != 0)
+        return;
+    
+    // Synth label on left - this should say "SYNTH ENGINE 1"
+    auto labelBounds = bounds.removeFromLeft(bounds.getWidth() * 0.6f);
+    if (fxLabel.isVisible())
+    {
+        fxLabel.setText("SYNTH ENGINE 1", juce::dontSendNotification);
+        fxLabel.setFont(juce::Font(14.0f, juce::Font::bold));
+        fxLabel.setJustificationType(juce::Justification::centredLeft);
+        fxLabel.setBounds(labelBounds.reduced(8));
+    }
+    
+    // Master volume on right
+    if (volumeSlider.isVisible() && volumeLabel.isVisible())
+    {
+        auto volumeBounds = bounds;
+        volumeBounds.reduce(8, 8);
+        
+        // Volume control with label below
+        auto volumeKnobBounds = volumeBounds.removeFromTop(volumeBounds.getHeight() * 0.7f);
+        auto volumeLabelBounds = volumeBounds;
+        
+        volumeSlider.setBounds(volumeKnobBounds);
+        volumeLabel.setBounds(volumeLabelBounds);
+        volumeLabel.setJustificationType(juce::Justification::centred);
+    }
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutVisualSectionWithFlexBox(juce::Rectangle<int> bounds)
+{
+    // Only layout visible components
+    if (currentTab != 0)
+        return;
+    
+    // Center the waveform display
+    const int VISUAL_SIZE = 160;
+    auto visualBounds = bounds.withSizeKeepingCentre(VISUAL_SIZE, VISUAL_SIZE);
+    
+    if (waveformDisplay && waveformDisplay->isVisible())
+        waveformDisplay->setBounds(visualBounds);
+    
+    // Display mode button in top-left corner
+    if (displayModeButton.isVisible())
+        displayModeButton.setBounds(bounds.getX() + 8, bounds.getY() + 8, 70, 24);
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutRightPanelWithFlexBox(juce::Rectangle<int> bounds)
+{
+    // Only layout if on main tab
+    if (currentTab != 0)
+        return;
+    
+    // FX section (70% of height)
+    auto fxBounds = bounds.removeFromTop(static_cast<int>(bounds.getHeight() * 0.7f));
+    layoutFXSectionWithFlexBox(fxBounds);
+    
+    // Add spacing
+    bounds.removeFromTop(16);
+    
+    // Macro section (remaining height)
+    auto macroBounds = bounds;
+    layoutMacroSectionWithFlexBox(macroBounds);
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutFXSectionWithFlexBox(juce::Rectangle<int> bounds)
+{
+    // Only layout visible FX components
+    if (currentTab != 0)
+        return;
+    
+    // FX section header
+    auto headerBounds = bounds.removeFromTop(30);
+    if (fxHeaderLabel.isVisible())
+    {
+        fxHeaderLabel.setText("● FX MODULES ●", juce::dontSendNotification);
+        fxHeaderLabel.setFont(juce::Font(12.0f, juce::Font::bold));
+        fxHeaderLabel.setJustificationType(juce::Justification::centred);
+        fxHeaderLabel.setBounds(headerBounds);
+    }
+    
+    // FX grid container - now spans most of the full width
+    const int GRID_SPACING = 12;
+    bounds.reduce(8, 8);
+    
+    // Calculate 2x2 grid dimensions for the wider area
+    int moduleWidth = (bounds.getWidth() - GRID_SPACING) / 2;
+    int moduleHeight = (bounds.getHeight() - GRID_SPACING) / 2;
+    
+    // Create clean grid layout using the full FX area width
+    juce::Rectangle<int> modules[4] = {
+        {bounds.getX(), bounds.getY(), moduleWidth, moduleHeight},
+        {bounds.getX() + moduleWidth + GRID_SPACING, bounds.getY(), moduleWidth, moduleHeight},
+        {bounds.getX(), bounds.getY() + moduleHeight + GRID_SPACING, moduleWidth, moduleHeight},
+        {bounds.getX() + moduleWidth + GRID_SPACING, bounds.getY() + moduleHeight + GRID_SPACING, moduleWidth, moduleHeight}
+    };
+    
+    // Layout FX modules only if their components are visible
+    if (reverbLabel.isVisible())
+        layoutFXModuleWithFlexBox(modules[0], reverbLabel, reverbSizeSlider, reverbDampSlider, reverbSizeLabel, reverbDampLabel, "REVERB");
+    if (delayLabel.isVisible())
+        layoutFXModuleWithFlexBox(modules[1], delayLabel, delayTimeSlider, delayFeedbackSlider, delayTimeLabel, delayFeedbackLabel, "DELAY");
+    if (filterLabel.isVisible())
+        layoutFXModuleWithFlexBox(modules[2], filterLabel, filterCutoffSlider, filterResonanceSlider, filterCutoffLabel, filterResonanceLabel, "FILTER");
+    if (distortionLabel.isVisible())
+        layoutFXModuleWithFlexBox(modules[3], distortionLabel, distortionDriveSlider, distortionMixSlider, distortionDriveLabel, distortionMixLabel, "DISTORTION");
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutFXModuleWithFlexBox(juce::Rectangle<int> bounds,
+                                                                   juce::Label& headerLabel,
+                                                                   juce::Slider& slider1,
+                                                                   juce::Slider& slider2,
+                                                                   juce::Label& label1,
+                                                                   juce::Label& label2,
+                                                                   const juce::String& title)
+{
+    // Ensure bounds are valid
+    if (bounds.getWidth() < 50 || bounds.getHeight() < 50)
+        return;
+    
+    // Module header
+    auto headerBounds = bounds.removeFromTop(20);
+    headerLabel.setBounds(headerBounds);
+    headerLabel.setText(title, juce::dontSendNotification);
+    headerLabel.setFont(juce::Font(10.0f, juce::Font::bold));
+    headerLabel.setJustificationType(juce::Justification::centred);
+    
+    // Control area with padding
+    bounds.reduce(6, 4);
+    
+    // Horizontal layout for two controls
+    int controlWidth = (bounds.getWidth() - 8) / 2;
+    int controlHeight = bounds.getHeight();
+    
+    // Left control
+    auto leftBounds = bounds.removeFromLeft(controlWidth);
+    auto leftKnobBounds = leftBounds.removeFromTop(leftBounds.getHeight() - 16);
+    auto leftLabelBounds = leftBounds;
+    
+    slider1.setBounds(leftKnobBounds);
+    label1.setBounds(leftLabelBounds);
+    label1.setJustificationType(juce::Justification::centred);
+    
+    // Spacing
+    bounds.removeFromLeft(8);
+    
+    // Right control  
+    auto rightBounds = bounds;
+    auto rightKnobBounds = rightBounds.removeFromTop(rightBounds.getHeight() - 16);
+    auto rightLabelBounds = rightBounds;
+    
+    slider2.setBounds(rightKnobBounds);
+    label2.setBounds(rightLabelBounds);
+    label2.setJustificationType(juce::Justification::centred);
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutMacroSectionWithFlexBox(juce::Rectangle<int> bounds)
+{
+    // Macro section header
+    auto headerBounds = bounds.removeFromTop(24);
+    // Use an existing label for macro header (we'll reuse one of the available labels)
+    
+    // Horizontal layout for 4 macro controls
+    bounds.reduce(8, 4);
+    
+    if (bounds.getWidth() > 0 && bounds.getHeight() > 0)
+    {
+        int macroWidth = bounds.getWidth() / 4;
+        int macroSpacing = 4;
+        
+        // Layout 4 macro controls in a row
+        for (int i = 0; i < 4; ++i)
+        {
+            auto macroBounds = juce::Rectangle<int>(
+                bounds.getX() + i * (macroWidth - macroSpacing),
+                bounds.getY(),
+                macroWidth - macroSpacing,
+                bounds.getHeight()
+            );
+            
+            // For now, we'll just reserve space for macro controls
+            // These can be implemented later as dedicated macro components
+        }
+    }
 }
 
 void VoidTextureSynthAudioProcessorEditor::layoutSynth1Section(juce::Rectangle<int> area)

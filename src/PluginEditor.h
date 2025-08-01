@@ -42,6 +42,23 @@ private:
     void layoutMacroControl(juce::Rectangle<int> bounds, 
                            juce::Slider& slider, 
                            juce::Label& label);
+    
+    // New FlexBox layout system methods (JUCE best practices)
+    void layoutWithFlexBox(juce::Rectangle<int> bounds);
+    void layoutMainTabWithFlexBox(juce::Rectangle<int> bounds);
+    void layoutSynthEngineArea(juce::Rectangle<int> bounds);
+    void layoutBottomFXAndMacros(juce::Rectangle<int> bounds);
+    void layoutLeftPanelWithFlexBox(juce::Rectangle<int> bounds);
+    void layoutRightPanelWithFlexBox(juce::Rectangle<int> bounds);
+    void layoutHeaderSectionWithFlexBox(juce::Rectangle<int> bounds);
+    void layoutVisualSectionWithFlexBox(juce::Rectangle<int> bounds);
+    void layoutFXSectionWithFlexBox(juce::Rectangle<int> bounds);
+    void layoutMacroSectionWithFlexBox(juce::Rectangle<int> bounds);
+    void layoutFXModuleWithFlexBox(juce::Rectangle<int> bounds,
+                                  juce::Label& headerLabel,
+                                  juce::Slider& slider1, juce::Slider& slider2,
+                                  juce::Label& label1, juce::Label& label2,
+                                  const juce::String& title);
     // Simple tab buttons - no lambdas, no complex setup
     juce::TextButton mainTabButton;
     juce::TextButton synth1TabButton;
