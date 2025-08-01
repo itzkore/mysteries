@@ -3,6 +3,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "Parameters.h"
+#include "GUI/WaveformDisplay.h"
 
 void VoidTextureSynthAudioProcessor::setOscPreset(int idx)
 {
@@ -103,6 +104,11 @@ void VoidTextureSynthAudioProcessor::prepareToPlay (double sampleRate, int sampl
 {
     juce::ignoreUnused (samplesPerBlock);
     currentSampleRate = static_cast<float>(sampleRate);
+    
+    // Initialize the enhanced synthesis engine
+    synthEngine1.prepareToPlay(samplesPerBlock, sampleRate);
+    
+    // Legacy oscillator initialization (can be removed later)
     oscPhase = 0.0f;
     oscFrequency = 220.0f;
     oscPhaseDelta = juce::MathConstants<float>::twoPi * oscFrequency / currentSampleRate;
@@ -176,51 +182,42 @@ void VoidTextureSynthAudioProcessor::processBlock (juce::AudioBuffer<float>& buf
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // --- Oscillator engine with presets and MIDI ---
-    auto* left = buffer.getWritePointer(0);
-    auto numSamples = buffer.getNumSamples();
-    
-    // Get master volume from parameter
-    float masterVolume = *apvts.getRawParameterValue("masterVolume");
-    
-    // Safety check for array bounds
-    if (oscPresetIndex >= 0 && oscPresetIndex < (int)oscPresets.size())
+    // --- Enhanced Multi-Layer Ambient Pad Synthesis ---
+    // Update layer frequencies and activation based on MIDI note
+    if (midiNote >= 0)
     {
-        float gain = oscPresets[oscPresetIndex].gain * masterVolume; // Apply master volume
-        float detune = oscPresets[oscPresetIndex].detune;
-        int waveform = (int)oscPresets[oscPresetIndex].waveform;
-        float freq = midiNote >= 0 ? juce::MidiMessage::getMidiNoteInHertz(midiNote) * (1.0f + detune) : 0.0f;
-        oscPhaseDelta = freq > 0.0f ? juce::MathConstants<float>::twoPi * freq / currentSampleRate : 0.0f;
+        float baseFreq = juce::MidiMessage::getMidiNoteInHertz(midiNote);
         
-        for (int i = 0; i < numSamples; ++i)
-        {
-            float sample = 0.0f;
-            if (midiNote >= 0)
-            {
-                switch (waveform)
-                {
-                    case 0: sample = std::sin(oscPhase); break; // Sine
-                    case 1: sample = oscPhase < juce::MathConstants<float>::pi ? -1.0f + 2.0f * oscPhase / juce::MathConstants<float>::pi : 3.0f - 2.0f * oscPhase / juce::MathConstants<float>::pi; break; // Saw
-                    case 2: sample = oscPhase < juce::MathConstants<float>::pi ? 1.0f : -1.0f; break; // Square
-                    case 3: sample = std::abs(oscPhase / juce::MathConstants<float>::pi - 1.0f) * 2.0f - 1.0f; break; // Triangle
-                    default: sample = std::sin(oscPhase); break;
-                }
-                sample *= gain;
-                oscPhase += oscPhaseDelta;
-                if (oscPhase > juce::MathConstants<float>::twoPi)
-                    oscPhase -= juce::MathConstants<float>::twoPi;
-            }
-            left[i] = sample;
-        }
+        // Update all layers with the base frequency and activate them
+        synthEngine1.getOscillatorLayer().setFrequency(baseFreq);
+        synthEngine1.getOscillatorLayer().setActive(true);
         
-        // Copy to right channel if stereo
-        if (buffer.getNumChannels() > 1)
-            buffer.copyFrom(1, 0, buffer, 0, 0, numSamples);
+        synthEngine1.getSubLayer().setFrequency(baseFreq * 0.5f); // Sub octave
+        synthEngine1.getSubLayer().setActive(true); // Activate sub layer
+        
+        synthEngine1.getNoiseLayer().setActive(true); // Activate noise layer
+        
+        // Process the enhanced synthesis engine
+        juce::AudioSourceChannelInfo channelInfo(&buffer, 0, buffer.getNumSamples());
+        synthEngine1.getNextAudioBlock(channelInfo);
+        
+        // Apply master volume to the final output
+        float masterVolume = *apvts.getRawParameterValue("masterVolume");
+        buffer.applyGain(masterVolume);
     }
     else
     {
-        // Safety fallback - clear buffer if preset index is invalid
+        // No MIDI note active - deactivate layers and clear buffer
+        synthEngine1.getOscillatorLayer().setActive(false);
+        synthEngine1.getSubLayer().setActive(false); // Deactivate sub layer
+        synthEngine1.getNoiseLayer().setActive(false); // Deactivate noise layer
         buffer.clear();
+    }
+    
+    // Update waveform display if connected
+    if (currentWaveformDisplay != nullptr)
+    {
+        currentWaveformDisplay->pushAudioData(buffer);
     }
 }
 

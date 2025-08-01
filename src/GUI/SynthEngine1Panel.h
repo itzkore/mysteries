@@ -53,9 +53,30 @@ private:
     juce::Label subLabel;
     juce::Label noiseLabel;
     juce::Label samplerLabel;
-    juce::Label levelLabel;
-    juce::Label panLabel;
-    juce::Label enableLabel;
+    
+    // Individual control labels - more specific for better organization
+    // Oscillator section
+    juce::Label oscLevelLabel;
+    juce::Label oscPanLabel;
+    juce::Label oscWaveformLabel;
+    juce::Label oscDetuneLabel;
+    juce::Label oscOctaveLabel;
+    
+    // Sub oscillator section
+    juce::Label subLevelLabel;
+    juce::Label subPanLabel;
+    juce::Label subWaveformLabel;
+    juce::Label subOctaveLabel;
+    
+    // Noise section
+    juce::Label noiseLevelLabel;
+    juce::Label noisePanLabel;
+    juce::Label noiseTypeLabel;
+    juce::Label noiseFilterLabel;
+    
+    // Sampler section
+    juce::Label samplerLevelLabel;
+    juce::Label samplerPanLabel;
     
     // Parameter attachments
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> oscillatorLevelAttachment;
