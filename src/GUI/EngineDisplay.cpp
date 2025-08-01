@@ -57,79 +57,69 @@ EngineDisplay::EngineDisplay(SynthEngine1& engine, juce::AudioProcessorValueTree
     addAndMakeVisible(distortionToggle);
     addAndMakeVisible(distortionDriveSlider);
 
-    // DEBUG: Add a large visible label
-    debugLabel.setText("DEBUG: EngineDisplay visible", juce::dontSendNotification);
-    debugLabel.setFont(juce::Font(18.0f, juce::Font::bold));
-    debugLabel.setColour(juce::Label::textColourId, juce::Colours::blue);
-    debugLabel.setJustificationType(juce::Justification::centred);
-    addAndMakeVisible(debugLabel);
-
-    // Attachments
+    // Set up parameter attachments
     oscWaveformAttachment.reset(new juce::AudioProcessorValueTreeState::ComboBoxAttachment(apvts, SynthEngine1::oscWaveformID, oscWaveformBox));
     oscFreqAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(apvts, SynthEngine1::oscFreqID, oscFreqSlider));
     noiseTypeAttachment.reset(new juce::AudioProcessorValueTreeState::ComboBoxAttachment(apvts, SynthEngine1::noiseTypeID, noiseTypeBox));
     subFreqAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(apvts, SynthEngine1::subFreqID, subFreqSlider));
     for (int i = 0; i < 4; ++i)
         macroAttachments[i].reset(new juce::AudioProcessorValueTreeState::SliderAttachment(apvts, SynthEngine1::macroParamIDs[i], macroKnobs[i]));
-
-    DBG("EngineDisplay constructed: " + juce::String::toHexString((uintptr_t)this));
 }
 
 EngineDisplay::~EngineDisplay() {}
 
 void EngineDisplay::paint(juce::Graphics& g)
 {
-    // Only draw a subtle background, do not obscure children
-    g.fillAll(juce::Colour(0xFF23242A));
-    g.setColour(juce::Colours::darkgrey);
-    g.drawRect(getLocalBounds().reduced(2), 1);
-    // Draw engine name at top left
-    g.setColour(juce::Colours::orange);
-    g.setFont(16.0f);
-    g.drawText(getName(), 8, 4, 120, 20, juce::Justification::left);
+    // Professional dark background with subtle gradient
+    auto bounds = getLocalBounds().toFloat();
+    juce::ColourGradient gradient(juce::Colour(0xFF2A2D34), 0.0f, 0.0f,
+                                 juce::Colour(0xFF1F2127), 0.0f, bounds.getHeight(), false);
+    g.setGradientFill(gradient);
+    g.fillRoundedRectangle(bounds, 8.0f);
+    
+    // Subtle border
+    g.setColour(juce::Colour(0xFF404858));
+    g.drawRoundedRectangle(bounds.reduced(1.0f), 8.0f, 1.0f);
+    
+    // Engine name with professional styling
+    g.setColour(juce::Colours::cyan);
+    g.setFont(juce::Font("Arial", 16.0f, juce::Font::bold));
+    auto titleArea = getLocalBounds().removeFromTop(25).reduced(8, 4);
+    g.drawText(getName() + " ENGINE", titleArea, juce::Justification::centredLeft);
 }
 
 void EngineDisplay::resized()
 {
-    auto area = getLocalBounds().reduced(8);
-    int rowH = 36, spacing = 8;
-    int y = area.getY();
-    int x = area.getX();
-    int w = area.getWidth();
-
-    // Top row: Oscillator, Sub, Noise
-    oscWaveformBox.setBounds(x, y, 80, rowH); x += 88;
-    oscFreqSlider.setBounds(x, y, 120, rowH); x += 128;
-    subFreqSlider.setBounds(x, y, 120, rowH); x += 128;
-    noiseTypeBox.setBounds(x, y, 80, rowH);
-
-    y += rowH + spacing; x = area.getX();
-
-    // Macro row
-    for (int i = 0; i < 4; ++i) {
-        macroKnobs[i].setBounds(x, y, 60, rowH); x += 68;
+    auto area = getLocalBounds().reduced(5);
+    area.removeFromTop(25); // Account for title area
+    
+    // If area is too small, don't try to layout
+    if (area.getWidth() < 50 || area.getHeight() < 30) {
+        return;
     }
-
-    y += rowH + spacing; x = area.getX();
-
-    // Mod matrix grid
-    int cell = 32;
-    for (int r = 0; r < 4; ++r) {
-        for (int c = 0; c < 4; ++c) {
-            modMatrixButtons[r][c].setBounds(x + c * (cell + 4), y + r * (cell + 4), cell, cell);
+    
+    int controlHeight = 30;
+    int spacing = 5;
+    
+    // Just place a few key controls in a simple horizontal layout
+    if (area.getHeight() >= controlHeight) {
+        auto controlRow = area.removeFromTop(controlHeight);
+        
+        // Oscillator waveform
+        if (controlRow.getWidth() >= 100) {
+            oscWaveformBox.setBounds(controlRow.removeFromLeft(100));
+            controlRow.removeFromLeft(spacing);
+        }
+        
+        // Frequency slider
+        if (controlRow.getWidth() >= 80) {
+            oscFreqSlider.setBounds(controlRow.removeFromLeft(80));
+            controlRow.removeFromLeft(spacing);
+        }
+        
+        // Sub frequency
+        if (controlRow.getWidth() >= 80) {
+            subFreqSlider.setBounds(controlRow.removeFromLeft(80));
         }
     }
-
-    y += 4 * (cell + 4) + spacing; x = area.getX();
-
-    // FX row
-    reverbToggle.setBounds(x, y, 60, rowH); x += 68;
-    reverbAmountSlider.setBounds(x, y, 100, rowH); x += 108;
-    delayToggle.setBounds(x, y, 60, rowH); x += 68;
-    delayTimeSlider.setBounds(x, y, 100, rowH); x += 108;
-    distortionToggle.setBounds(x, y, 80, rowH); x += 88;
-    distortionDriveSlider.setBounds(x, y, 100, rowH);
-
-    // DEBUG: Place debug label at bottom
-    debugLabel.setBounds(10, getHeight() - 28, getWidth() - 20, 24);
 }

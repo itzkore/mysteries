@@ -2,6 +2,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "Parameters.h"
 
 void VoidTextureSynthAudioProcessor::setOscPreset(int idx)
 {
@@ -28,25 +29,7 @@ VoidTextureSynthAudioProcessor::VoidTextureSynthAudioProcessor()
 
 juce::AudioProcessorValueTreeState::ParameterLayout VoidTextureSynthAudioProcessor::createParameterLayout()
 {
-    juce::AudioProcessorValueTreeState::ParameterLayout layout;
-    // Macro parameters
-    layout.add(std::make_unique<juce::AudioParameterFloat>("macro1", "Macro 1", 0.0f, 1.0f, 0.5f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("macro2", "Macro 2", 0.0f, 1.0f, 0.5f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("macro3", "Macro 3", 0.0f, 1.0f, 0.5f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("macro4", "Macro 4", 0.0f, 1.0f, 0.5f));
-
-    // Oscillator controls
-    layout.add(std::make_unique<juce::AudioParameterChoice>("oscWaveform", "Osc Waveform", juce::StringArray{ "Sine", "Saw", "Square" }, 0));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("oscFreq", "Osc Frequency", 20.0f, 20000.0f, 440.0f));
-
-    // Noise controls
-    layout.add(std::make_unique<juce::AudioParameterChoice>("noiseType", "Noise Type", juce::StringArray{ "White" }, 0));
-
-    // Sub controls
-    layout.add(std::make_unique<juce::AudioParameterFloat>("subFreq", "Sub Frequency", 20.0f, 200.0f, 60.0f));
-
-    // Add more parameters as needed
-    return layout;
+    return ::createParameterLayout(); // Use the comprehensive parameter layout from Parameters.cpp
 }
 
 VoidTextureSynthAudioProcessor::~VoidTextureSynthAudioProcessor() {}
@@ -196,37 +179,49 @@ void VoidTextureSynthAudioProcessor::processBlock (juce::AudioBuffer<float>& buf
     // --- Oscillator engine with presets and MIDI ---
     auto* left = buffer.getWritePointer(0);
     auto numSamples = buffer.getNumSamples();
-    float gain = oscPresets[oscPresetIndex].gain;
-    float detune = oscPresets[oscPresetIndex].detune;
-    int waveform = (int)oscPresets[oscPresetIndex].waveform;
-    float freq = midiNote >= 0 ? juce::MidiMessage::getMidiNoteInHertz(midiNote) * (1.0f + detune) : 0.0f;
-    oscPhaseDelta = freq > 0.0f ? juce::MathConstants<float>::twoPi * freq / currentSampleRate : 0.0f;
-    for (int i = 0; i < numSamples; ++i)
+    
+    // Get master volume from parameter
+    float masterVolume = *apvts.getRawParameterValue("masterVolume");
+    
+    // Safety check for array bounds
+    if (oscPresetIndex >= 0 && oscPresetIndex < (int)oscPresets.size())
     {
-        float sample = 0.0f;
-        if (midiNote >= 0)
+        float gain = oscPresets[oscPresetIndex].gain * masterVolume; // Apply master volume
+        float detune = oscPresets[oscPresetIndex].detune;
+        int waveform = (int)oscPresets[oscPresetIndex].waveform;
+        float freq = midiNote >= 0 ? juce::MidiMessage::getMidiNoteInHertz(midiNote) * (1.0f + detune) : 0.0f;
+        oscPhaseDelta = freq > 0.0f ? juce::MathConstants<float>::twoPi * freq / currentSampleRate : 0.0f;
+        
+        for (int i = 0; i < numSamples; ++i)
         {
-            switch (waveform)
+            float sample = 0.0f;
+            if (midiNote >= 0)
             {
-                case 0: sample = std::sin(oscPhase); break; // Sine
-                case 1: sample = oscPhase < juce::MathConstants<float>::pi ? -1.0f + 2.0f * oscPhase / juce::MathConstants<float>::pi : 3.0f - 2.0f * oscPhase / juce::MathConstants<float>::pi; break; // Saw
-                case 2: sample = oscPhase < juce::MathConstants<float>::pi ? 1.0f : -1.0f; break; // Square
-                case 3: sample = std::abs(oscPhase / juce::MathConstants<float>::pi - 1.0f) * 2.0f - 1.0f; break; // Triangle
-                default: sample = std::sin(oscPhase); break;
+                switch (waveform)
+                {
+                    case 0: sample = std::sin(oscPhase); break; // Sine
+                    case 1: sample = oscPhase < juce::MathConstants<float>::pi ? -1.0f + 2.0f * oscPhase / juce::MathConstants<float>::pi : 3.0f - 2.0f * oscPhase / juce::MathConstants<float>::pi; break; // Saw
+                    case 2: sample = oscPhase < juce::MathConstants<float>::pi ? 1.0f : -1.0f; break; // Square
+                    case 3: sample = std::abs(oscPhase / juce::MathConstants<float>::pi - 1.0f) * 2.0f - 1.0f; break; // Triangle
+                    default: sample = std::sin(oscPhase); break;
+                }
+                sample *= gain;
+                oscPhase += oscPhaseDelta;
+                if (oscPhase > juce::MathConstants<float>::twoPi)
+                    oscPhase -= juce::MathConstants<float>::twoPi;
             }
-            sample *= gain;
-            oscPhase += oscPhaseDelta;
-            if (oscPhase > juce::MathConstants<float>::twoPi)
-                oscPhase -= juce::MathConstants<float>::twoPi;
+            left[i] = sample;
         }
-        left[i] = sample;
+        
+        // Copy to right channel if stereo
+        if (buffer.getNumChannels() > 1)
+            buffer.copyFrom(1, 0, buffer, 0, 0, numSamples);
     }
-    // Copy to right channel if stereo
-    if (buffer.getNumChannels() > 1)
-        buffer.copyFrom(1, 0, buffer, 0, 0, numSamples);
     else
-        // If mono, copy left to right channel
-        buffer.copyFrom(1, 0, buffer, 0, 0, numSamples);
+    {
+        // Safety fallback - clear buffer if preset index is invalid
+        buffer.clear();
+    }
 }
 
 juce::AudioProcessorEditor* VoidTextureSynthAudioProcessor::createEditor() { return new VoidTextureSynthAudioProcessorEditor(*this); }

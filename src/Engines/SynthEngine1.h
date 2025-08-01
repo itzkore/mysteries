@@ -2,10 +2,10 @@
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_dsp/juce_dsp.h>
 #include <juce_audio_processors/juce_audio_processors.h>
-#include "OscillatorLayer.h"
-#include "SubLayer.h"
-#include "NoiseLayer.h"
-#include "SamplerLayer.h"
+#include "../Synth/OscillatorLayer.h"
+#include "../Synth/SubLayer.h"
+#include "../Synth/NoiseLayer.h"
+#include "../Synth/SamplerLayer.h"
 
 class SynthEngine1 : public juce::AudioSource {
 public:

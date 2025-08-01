@@ -1,13 +1,10 @@
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "PluginProcessor.h"
-#include "GUI/MacroPanel.h"
-#include "GUI/EngineDisplay.h"
-#include "GUI/VoidLookAndFeel.h"
-
 
 //==============================================================================
-class VoidTextureSynthAudioProcessorEditor : public juce::AudioProcessorEditor
+class VoidTextureSynthAudioProcessorEditor : public juce::AudioProcessorEditor,
+                                              public juce::Button::Listener
 {
 public:
     VoidTextureSynthAudioProcessorEditor (VoidTextureSynthAudioProcessor&);
@@ -15,20 +12,30 @@ public:
 
     void paint (juce::Graphics&) override;
     void resized() override;
-
-
+    void buttonClicked(juce::Button* button) override;
+    
 private:
-private:
-    VoidLookAndFeel voidLookAndFeel;
-    std::unique_ptr<MacroPanel> macroPanel;
-    // Only show actual engines: Oscillator, Sampler, Noise, Sub
-    std::unique_ptr<EngineDisplay> oscDisplay;
-    std::unique_ptr<EngineDisplay> samplerDisplay;
-    std::unique_ptr<EngineDisplay> noiseDisplay;
-    std::unique_ptr<EngineDisplay> subDisplay;
+    void updateTabVisibility();
+    // Simple tab buttons - no lambdas, no complex setup
+    juce::TextButton mainTabButton;
+    juce::TextButton synth1TabButton;
+    juce::TextButton synth2TabButton;
+    
+    // Single content area - we'll just change what's displayed
+    juce::Component contentArea;
+    
+    // All controls as direct members
+    juce::Label titleLabel;
+    juce::Slider volumeSlider;
+    juce::Label volumeLabel;
+    juce::Label synth1Label;
+    juce::Label synth2Label;
+    
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> volumeAttachment;
+    
+    int currentTab = 0;
+    
     VoidTextureSynthAudioProcessor& audioProcessor;
-    juce::Label debugLabel;
-    juce::Label childCountLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VoidTextureSynthAudioProcessorEditor)
 };

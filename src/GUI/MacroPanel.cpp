@@ -35,26 +35,48 @@ MacroPanel::~MacroPanel()
 
 void MacroPanel::paint(juce::Graphics& g)
 {
-    g.setColour(juce::Colours::darkgrey);
-    g.fillRoundedRectangle(getLocalBounds().toFloat(), 16.0f);
+    // Professional dark background with rounded corners  
+    auto bounds = getLocalBounds().toFloat();
+    juce::ColourGradient gradient(juce::Colour(0xFF2A2D34), 0.0f, 0.0f,
+                                 juce::Colour(0xFF1F2127), 0.0f, bounds.getHeight(), false);
+    g.setGradientFill(gradient);
+    g.fillRoundedRectangle(bounds, 8.0f);
+    
+    // Subtle border
+    g.setColour(juce::Colour(0xFF404858));
+    g.drawRoundedRectangle(bounds.reduced(1.0f), 8.0f, 1.0f);
+    
+    // Title
     g.setColour(juce::Colours::cyan);
-    g.setFont(18.0f);
-    g.drawFittedText("MACRO PANEL", getLocalBounds().reduced(8), juce::Justification::centred, 1);
+    g.setFont(juce::Font("Arial", 16.0f, juce::Font::bold));
+    auto titleArea = getLocalBounds().removeFromTop(25).reduced(8, 4);
+    g.drawText("MACRO CONTROLS", titleArea, juce::Justification::centredLeft);
 }
 
 void MacroPanel::resized()
 {
-    auto area = getLocalBounds().reduced(16);
-    int knobWidth = juce::jmin(area.getWidth() / 4, 120);
-    int knobHeight = 100;
-    int labelHeight = 24;
+    auto area = getLocalBounds().reduced(5);
+    area.removeFromTop(25); // Account for title area
+    
+    if (area.getHeight() < 60 || area.getWidth() < 200) {
+        return; // Too small to layout properly
+    }
+    
+    // Simple horizontal layout for the 4 macro knobs
+    int knobWidth = juce::jmin(area.getWidth() / 4 - 5, 80);
+    int knobHeight = juce::jmin(area.getHeight() - 20, 70);
     int spacing = (area.getWidth() - (knobWidth * 4)) / 5;
     int x = area.getX() + spacing;
-    int y = area.getY() + 16;
+    int y = area.getY() + 5;
+    
     for (int i = 0; i < 4; ++i)
     {
-        macroKnobs[i]->setBounds(x, y, knobWidth, knobHeight);
-        macroLabels[i]->setBounds(x, y + knobHeight + 4, knobWidth, labelHeight);
+        if (i < macroKnobs.size()) {
+            macroKnobs[i]->setBounds(x, y, knobWidth, knobHeight);
+            if (i < macroLabels.size()) {
+                macroLabels[i]->setBounds(x, y + knobHeight, knobWidth, 16);
+            }
+        }
         x += knobWidth + spacing;
     }
 }

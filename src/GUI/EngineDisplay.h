@@ -54,16 +54,14 @@ private:
     // Visual waveform/spectrum display
     juce::Component waveformDisplay;
 
-    // APVTS attachments (existing)
+    // APVTS attachments for parameter control
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> oscWaveformAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> oscFreqAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> noiseTypeAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> subFreqAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> macroAttachments[4];
 
-    // DEBUG label
-    juce::Label debugLabel;
-
+    // Internal setup methods
     void setupControls();
     void wireControls();
     void setupMacroControls();

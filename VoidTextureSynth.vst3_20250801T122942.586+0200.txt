@@ -1,0 +1,37 @@
+Random seed: 0x5cac7cd
+Validation started
+	1 Aug 2025 12:29:42pm
+
+Strictness level: 1
+-----------------------------------------------------------------
+Starting tests in: pluginval / Scan for plugins located in: C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth_artefacts\Release\VST3\VoidTextureSynth.vst3...
+Num plugins found: 1
+
+Testing plugin: VST3-VoidTextureSynth-d4a26223-16f27c82
+Voidwalker: VoidTextureSynth v1.0.0
+Completed tests in pluginval / Scan for plugins located in: C:\Voidwalker\VoidTextureSynth\build\VoidTextureSynth_artefacts\Release\VST3\VoidTextureSynth.vst3
+-----------------------------------------------------------------
+Starting tests in: pluginval / Open plugin (cold)...
+
+Time taken to open plugin (cold): 172 ms
+Completed tests in pluginval / Open plugin (cold)
+-----------------------------------------------------------------
+Starting tests in: pluginval / Open plugin (warm)...
+
+Time taken to open plugin (warm): 13 ms
+Running tests 1 times
+Completed tests in pluginval / Open plugin (warm)
+-----------------------------------------------------------------
+Starting tests in: pluginval / Plugin info...
+
+Plugin name: VoidTextureSynth
+Alternative names: VoidTextureSynth
+SupportsDoublePrecision: no
+Reported latency: 0
+Reported taillength: 0
+
+Time taken to run test: 0
+
+Time taken to run all tests: 496 ms
+Completed tests in pluginval / Plugin info
+SUCCESS

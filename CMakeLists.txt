@@ -4,18 +4,32 @@ project(VoidTextureSynth VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
+# Set default build type to Release for better performance
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+endif()
+
 # JUCE submodule
 add_subdirectory(ext/JUCE)
 
+# Optimize for Release builds
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    if(MSVC)
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /DNDEBUG")
+    else()
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG -ffast-math")
+    endif()
+endif()
 
-
-# Enable Address Sanitizer only for non-MSVC builds
-if (NOT MSVC)
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address")
-    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address")
-else()
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi /Od")
-    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
+# Only enable debug flags for explicit Debug builds
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if(NOT MSVC)
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address")
+        set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address")
+    else()
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi /Od")
+        set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
+    endif()
 endif()
 
 juce_add_plugin(VoidTextureSynth
@@ -38,6 +52,8 @@ target_sources(VoidTextureSynth PRIVATE
     src/Synth/SamplerLayer.cpp
     src/PluginProcessor.cpp
     src/PluginEditor.cpp
+    src/Parameters.cpp
+    src/Parameters.h
     src/GUI/EngineDisplay.cpp
     src/GUI/MacroPanel.cpp
     src/GUI/VoidLookAndFeel.cpp
