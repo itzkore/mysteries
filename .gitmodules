@@ -2,3 +2,6 @@
 	path = ext/JUCE
 	url = https://github.com/juce-framework/JUCE.git
 	branch = 8.0.8
+[submodule "ext/melatonin_inspector"]
+	path = ext/melatonin_inspector
+	url = https://github.com/sudara/melatonin_inspector.git

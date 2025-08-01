@@ -12,6 +12,11 @@ endif()
 # JUCE submodule
 add_subdirectory(ext/JUCE)
 
+# Melatonin Inspector for real-time layout debugging (Debug builds only)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_subdirectory(ext/melatonin_inspector)
+endif()
+
 # Optimize for Release builds
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     if(MSVC)
@@ -106,6 +111,12 @@ target_link_libraries(VoidTextureSynth PRIVATE
     juce::juce_opengl
     juce::juce_audio_formats
 )
+
+# Link Melatonin Inspector for Debug builds only
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_link_libraries(VoidTextureSynth PRIVATE melatonin_inspector)
+    target_compile_definitions(VoidTextureSynth PRIVATE MELATONIN_INSPECTOR=1)
+endif()
 
 # Ensure Source/Synth headers are available
 target_include_directories(VoidTextureSynth PRIVATE

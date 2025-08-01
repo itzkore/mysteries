@@ -202,6 +202,20 @@ void VoidTextureSynthAudioProcessorEditor::buttonClicked(juce::Button* button)
     updateTabVisibility();
 }
 
+bool VoidTextureSynthAudioProcessorEditor::keyPressed(const juce::KeyPress& key)
+{
+#if MELATONIN_INSPECTOR && JUCE_DEBUG
+    // Toggle Melatonin Inspector with Ctrl+Shift+I (Debug builds only)
+    if (key == juce::KeyPress('i', juce::ModifierKeys::ctrlModifier | juce::ModifierKeys::shiftModifier, 0))
+    {
+        inspector.setVisible(!inspector.isVisible());
+        return true;
+    }
+#endif
+    
+    return false; // Let other components handle the key
+}
+
 void VoidTextureSynthAudioProcessorEditor::updateTabVisibility()
 {
     // Check if we're in validation mode

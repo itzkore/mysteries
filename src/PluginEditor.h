@@ -5,6 +5,11 @@
 #include "GUI/OrbVisualizer.h"
 #include "GUI/VoidLookAndFeel.h"
 
+// Melatonin Inspector for real-time layout debugging (Debug only)
+#if MELATONIN_INSPECTOR && JUCE_DEBUG
+#include "melatonin_inspector/melatonin_inspector.h"
+#endif
+
 //==============================================================================
 class VoidTextureSynthAudioProcessorEditor : public juce::AudioProcessorEditor,
                                               public juce::Button::Listener
@@ -16,6 +21,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
     void buttonClicked(juce::Button* button) override;
+    bool keyPressed(const juce::KeyPress& key) override;
     
 private:
     void updateTabVisibility();
@@ -152,6 +158,11 @@ private:
     
     // Custom look and feel for cosmic aesthetic
     VoidLookAndFeel voidLookAndFeel;
+    
+    // Melatonin Inspector for real-time layout debugging (Debug only)
+#if MELATONIN_INSPECTOR && JUCE_DEBUG
+    melatonin::Inspector inspector { *this };
+#endif
     
     int currentTab = 0;
     
