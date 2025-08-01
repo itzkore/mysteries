@@ -102,6 +102,9 @@ VoidTextureSynthAudioProcessorEditor::VoidTextureSynthAudioProcessorEditor (Void
     delayLabel.setJustificationType(juce::Justification::centred);
     contentArea.addAndMakeVisible(delayLabel);
     
+    // Initialize FX Module Controls
+    setupFXControls();
+    
     // Setup synth2 label (placeholder for future) with improved styling
     synth2Label.setText("SYNTH ENGINE 2\n\nComing Soon", juce::dontSendNotification);
     synth2Label.setFont(juce::Font(24.0f, juce::Font::bold));
@@ -123,13 +126,18 @@ VoidTextureSynthAudioProcessorEditor::VoidTextureSynthAudioProcessorEditor (Void
     titleLabel.setJustificationType(juce::Justification::centred);
     contentArea.addAndMakeVisible(titleLabel);
     
-    // Volume slider with improved styling
+    // Setup main title
+    titleLabel.setText("VoidTextureSynth", juce::dontSendNotification);
+    titleLabel.setFont(juce::Font(32.0f, juce::Font::bold));
+    titleLabel.setColour(juce::Label::textColourId, juce::Colour(0xFF99CCFF));
+    titleLabel.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(titleLabel);
+    
+    // Setup master volume control with professional styling
     volumeSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     volumeSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, 15);
     volumeSlider.setRange(0.0, 1.0, 0.01);
     volumeSlider.setValue(0.7);
-    
-    // Blue theme for volume control
     volumeSlider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colour(0xFF2A5599));
     volumeSlider.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colour(0xFF1A1A20));
     volumeSlider.setColour(juce::Slider::thumbColourId, juce::Colour(0xFF99CCFF));
@@ -144,32 +152,19 @@ VoidTextureSynthAudioProcessorEditor::VoidTextureSynthAudioProcessorEditor (Void
     volumeLabel.setJustificationType(juce::Justification::centred);
     contentArea.addAndMakeVisible(volumeLabel);
     
-    // Setup main controls
-    titleLabel.setText("VoidTextureSynth", juce::dontSendNotification);
-    titleLabel.setFont(juce::Font(28.0f, juce::Font::bold));
-    titleLabel.setColour(juce::Label::textColourId, juce::Colours::white);
-    titleLabel.setJustificationType(juce::Justification::centred);
-    contentArea.addAndMakeVisible(titleLabel);
-    
-    // Volume slider
-    volumeSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    volumeSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
-    volumeSlider.setRange(0.0, 1.0, 0.01);
-    volumeSlider.setValue(0.7);
-    volumeSlider.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::cyan);
-    volumeSlider.setColour(juce::Slider::textBoxTextColourId, juce::Colours::white);
-    contentArea.addAndMakeVisible(volumeSlider);
-    
     // Connect volume slider to parameter
     volumeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
         audioProcessor.apvts, "masterVolume", volumeSlider);
     
-    // Volume label
-    volumeLabel.setText("MASTER VOLUME", juce::dontSendNotification);
-    volumeLabel.setFont(juce::Font(12.0f, juce::Font::bold));
-    volumeLabel.setColour(juce::Label::textColourId, juce::Colours::cyan);
-    volumeLabel.setJustificationType(juce::Justification::centred);
-    contentArea.addAndMakeVisible(volumeLabel);
+    // Connect macro sliders to parameters
+    macro1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        audioProcessor.apvts, "macro1", macro1Slider);
+    macro2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        audioProcessor.apvts, "macro2", macro2Slider);
+    macro3Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        audioProcessor.apvts, "macro3", macro3Slider);
+    macro4Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        audioProcessor.apvts, "macro4", macro4Slider);
     
     // Setup synth2 label (placeholder for future)
     synth2Label.setText("SYNTH ENGINE 2\n\nReserved for Future Expansion", juce::dontSendNotification);
@@ -238,6 +233,9 @@ void VoidTextureSynthAudioProcessorEditor::updateTabVisibility()
     reverbLabel.setVisible(false);
     delayLabel.setVisible(false);
     
+    // Hide all FX controls
+    setFXControlsVisible(false);
+    
     // Show content for current tab
     switch (currentTab)
     {
@@ -251,6 +249,7 @@ void VoidTextureSynthAudioProcessorEditor::updateTabVisibility()
             fxLabel.setVisible(true);
             reverbLabel.setVisible(true);
             delayLabel.setVisible(true);
+            setFXControlsVisible(true);
             break;
         case 1: // Synth 1
             if (synthEngine1Panel)
@@ -414,8 +413,9 @@ void VoidTextureSynthAudioProcessorEditor::resized()
         return;
     }
     
-    // NORMAL MODE: Full layout
-    // Tab buttons at top
+    // NORMAL MODE: Full layout with professional precision
+    
+    // Tab buttons at top - precisely positioned
     auto tabArea = bounds.removeFromTop(40);
     auto buttonWidth = tabArea.getWidth() / 3;
     mainTabButton.setBounds(0, 0, buttonWidth, 40);
@@ -426,97 +426,12 @@ void VoidTextureSynthAudioProcessorEditor::resized()
     contentArea.setBounds(bounds);
     
     // Layout content based on current tab
-    if (currentTab == 0) // Main tab
+    if (currentTab == 0) // Main tab - Professional layout rework
     {
-        auto contentBounds = bounds;
-        
-        // Top title area with cosmic styling and consistent spacing
-        auto titleArea = contentBounds.removeFromTop(60);
-        titleLabel.setBounds(titleArea.reduced(30, 10));
-        
-        // Create two halves for Synth 1 and future Synth 2 with cosmic layout proportions
-        auto leftHalf = contentBounds.removeFromLeft(contentBounds.getWidth() / 2);
-        auto rightHalf = contentBounds;
-        
-        // Add margin between halves for better separation with cosmic aesthetic
-        leftHalf.reduce(12, 12);
-        rightHalf.reduce(12, 12);
-        
-        // Master volume positioned properly at top with enough clickable area
-        auto volumeSection = leftHalf.removeFromTop(70);
-        auto volumeArea = volumeSection.removeFromRight(100).reduced(5, 5);
-        volumeSlider.setBounds(volumeArea);
-        volumeLabel.setBounds(volumeArea.getX(), volumeArea.getBottom() - 15, volumeArea.getWidth(), 15);
-        
-        // Only show Synth Engine 1 label on the main tab
-        auto synth1HeaderArea = leftHalf.removeFromTop(30);
-        fxLabel.setText("SYNTH ENGINE 1", juce::dontSendNotification);
-        fxLabel.setBounds(synth1HeaderArea);
-        
-        // Create proper layout for left half - split into sections
-        auto leftPanelContent = leftHalf;
-        
-        // Orb visualizer centered with more presence - adjusted for cosmic theme
-        auto orbSectionHeight = leftPanelContent.getHeight() * 0.50f; // Reduced prominence for spacing
-        auto orbArea = leftPanelContent.removeFromTop(orbSectionHeight);
-        
-        // Centered orb with custom dimensions - larger for better visibility
-        int orbWidth = std::min(orbArea.getWidth() - 100, 180);  // Further reduced max size
-        int orbHeight = std::min(orbArea.getHeight() - 80, 180);
-        int orbX = orbArea.getCentreX() - orbWidth/2;
-        int orbY = orbArea.getCentreY() - orbHeight/2 - 20;
-        juce::Rectangle<int> orbBounds(orbX, orbY, orbWidth, orbHeight);
-        
-        // Display mode button below orb with cosmic styling
-        displayModeButton.setBounds(juce::Rectangle<int>(orbBounds.getCentreX() - 50, orbBounds.getBottom() + 10, 100, 25));
-        
-        if (waveformDisplay)
-            waveformDisplay->setBounds(orbBounds);
-        
-        // FX section reduced for compact layout
-        auto remainingHeight = leftPanelContent.getHeight();
-        auto fxSectionArea = leftPanelContent.removeFromBottom(remainingHeight * 0.15f);  // 15% of remaining height
-        
-        // Add a label for FX section with cosmic styling
-        auto fxHeaderArea = fxSectionArea.removeFromTop(25);
-        reverbLabel.setText("FX MODULES", juce::dontSendNotification);
-        reverbLabel.setFont(juce::Font(14.0f, juce::Font::bold));
-        reverbLabel.setBounds(fxHeaderArea.reduced(5, 0));
-        
-        // Create a compact grid for FX modules (2x2)
-        const int moduleWidth = (fxSectionArea.getWidth() - 30) / 2;
-        const int moduleHeight = (fxSectionArea.getHeight() - 20) / 2;
-        
-        // Four FX modules in a grid - more compact layout
-        juce::Rectangle<int> module1Bounds(fxSectionArea.getX() + 5, 
-                                          fxHeaderArea.getBottom() + 5, 
-                                          moduleWidth, moduleHeight);
-        
-        juce::Rectangle<int> module2Bounds(module1Bounds.getRight() + 5, 
-                                          module1Bounds.getY(), 
-                                          moduleWidth, moduleHeight);
-        
-        juce::Rectangle<int> module3Bounds(module1Bounds.getX(), 
-                                          module1Bounds.getBottom() + 5, 
-                                          moduleWidth, moduleHeight);
-        
-        juce::Rectangle<int> module4Bounds(module2Bounds.getX(), 
-                                          module3Bounds.getY(), 
-                                          moduleWidth, moduleHeight);
-        
-        // Set delay label to the first module position with cosmic styling
-        // Reduce FX module header size for better fit
-        auto fxLabelBounds = module1Bounds.removeFromTop(18);
-        delayLabel.setBounds(fxLabelBounds);
-        delayLabel.setFont(juce::Font(12.0f, juce::Font::bold));
-        delayLabel.setText("REVERB", juce::dontSendNotification);
-        
-        // Right half is reserved for Synth 2 with cosmic purple styling
-        synth2Label.setBounds(rightHalf.reduced(20));
+        layoutMainTab(bounds);
     }
-    else if (currentTab == 1) // Synth 1
+    else if (currentTab == 1) // Synth 1 tab
     {
-        // Only set the Synth Engine 1 panel visible on the Synth 1 tab
         if (synthEngine1Panel) {
             synthEngine1Panel->setBounds(bounds);
         }
@@ -526,6 +441,264 @@ void VoidTextureSynthAudioProcessorEditor::resized()
         // Show only synth 2 label
         synth2Label.setBounds(bounds);
     }
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutMainTab(juce::Rectangle<int> bounds)
+{
+    // Professional main tab layout with clear separation of concerns
+    
+    // Top title area with consistent spacing
+    auto titleArea = bounds.removeFromTop(60);
+    titleLabel.setBounds(titleArea.reduced(30, 10));
+    
+    // Create two clean halves for dual-synth layout
+    auto leftHalf = bounds.removeFromLeft(bounds.getWidth() / 2);
+    auto rightHalf = bounds;
+    
+    // Add professional margins
+    leftHalf = leftHalf.reduced(15, 10);
+    rightHalf = rightHalf.reduced(15, 10);
+    
+    // === LEFT HALF: SYNTH 1 SECTION ===
+    layoutSynth1Section(leftHalf);
+    
+    // === RIGHT HALF: SYNTH 2 PLACEHOLDER ===
+    synth2Label.setBounds(rightHalf.reduced(20));
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutSynth1Section(juce::Rectangle<int> area)
+{
+    // Professional Synth 1 layout with optimal space utilization
+    
+    // Header with master volume - clean horizontal layout
+    auto headerArea = area.removeFromTop(50);
+    auto volumeArea = headerArea.removeFromRight(85);
+    
+    // Synth 1 label on the left
+    auto synth1LabelArea = headerArea.reduced(5, 5);
+    fxLabel.setText("SYNTH ENGINE 1", juce::dontSendNotification);
+    fxLabel.setFont(juce::Font(14.0f, juce::Font::bold));
+    fxLabel.setJustificationType(juce::Justification::centredLeft);
+    fxLabel.setBounds(synth1LabelArea);
+    
+    // Master volume controls on the right - clean vertical stack
+    auto volumeKnobArea = volumeArea.removeFromTop(35);
+    auto volumeLabelArea = volumeArea;
+    volumeSlider.setBounds(volumeKnobArea.reduced(5));
+    volumeLabel.setBounds(volumeLabelArea);
+    
+    // Add spacing
+    area.removeFromTop(10);
+    
+    // Visual display area - properly sized and centered
+    auto visualArea = area.removeFromTop(static_cast<int>(area.getHeight() * 0.45f));
+    layoutVisualSection(visualArea);
+    
+    // Add spacing
+    area.removeFromTop(15);
+    
+    // Bottom controls area - FX and Macros side by side
+    layoutBottomControls(area);
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutVisualSection(juce::Rectangle<int> area)
+{
+    // Professional orb visualizer layout
+    
+    // Calculate optimal orb size
+    int maxSize = std::min(area.getWidth() - 60, area.getHeight() - 40);
+    int orbSize = std::max(140, std::min(maxSize, 200));
+    
+    // Center the orb perfectly
+    int orbX = area.getCentreX() - orbSize/2;
+    int orbY = area.getCentreY() - orbSize/2;
+    juce::Rectangle<int> orbBounds(orbX, orbY, orbSize, orbSize);
+    
+    if (waveformDisplay)
+        waveformDisplay->setBounds(orbBounds);
+    
+    // Display mode button - clean positioning
+    displayModeButton.setBounds(area.getX() + 5, area.getY() + 5, 60, 18);
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutBottomControls(juce::Rectangle<int> area)
+{
+    // Professional side-by-side layout: FX (65%) + Macros (35%)
+    
+    auto fxArea = area.removeFromLeft(static_cast<int>(area.getWidth() * 0.65f));
+    area.removeFromLeft(10); // Gap
+    auto macroArea = area;
+    
+    // Layout FX section
+    layoutFXSection(fxArea);
+    
+    // Layout Macro section
+    layoutMacroSection(macroArea);
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutFXSection(juce::Rectangle<int> area)
+{
+    // FX section header
+    auto headerArea = area.removeFromTop(22);
+    fxHeaderLabel.setText("● FX MODULES ●", juce::dontSendNotification);
+    fxHeaderLabel.setFont(juce::Font(11.0f, juce::Font::bold));
+    fxHeaderLabel.setJustificationType(juce::Justification::centred);
+    fxHeaderLabel.setBounds(headerArea);
+    
+    // Add spacing
+    area.removeFromTop(8);
+    
+    // Calculate clean 2x2 grid for FX modules
+    const int margin = 8;
+    const int spacing = 8;
+    const int moduleWidth = (area.getWidth() - (2 * margin + spacing)) / 2;
+    const int moduleHeight = (area.getHeight() - (2 * margin + spacing)) / 2;
+    
+    // Create module bounds
+    juce::Rectangle<int> modules[4] = {
+        {area.getX() + margin, area.getY() + margin, moduleWidth, moduleHeight},
+        {area.getX() + margin + moduleWidth + spacing, area.getY() + margin, moduleWidth, moduleHeight},
+        {area.getX() + margin, area.getY() + margin + moduleHeight + spacing, moduleWidth, moduleHeight},
+        {area.getX() + margin + moduleWidth + spacing, area.getY() + margin + moduleHeight + spacing, moduleWidth, moduleHeight}
+    };
+    
+    // Layout each FX module
+    layoutFXModule(modules[0], reverbLabel, reverbSizeSlider, reverbDampSlider, reverbSizeLabel, reverbDampLabel, "REVERB");
+    layoutFXModule(modules[1], delayLabel, delayTimeSlider, delayFeedbackSlider, delayTimeLabel, delayFeedbackLabel, "DELAY");
+    layoutFXModule(modules[2], filterLabel, filterCutoffSlider, filterResonanceSlider, filterCutoffLabel, filterResonanceLabel, "FILTER");
+    layoutFXModule(modules[3], distortionLabel, distortionDriveSlider, distortionMixSlider, distortionDriveLabel, distortionMixLabel, "DISTORTION");
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutFXModule6Controls(juce::Rectangle<int> bounds, 
+                                                                juce::Label& headerLabel,
+                                                                std::vector<juce::Slider*> sliders,
+                                                                std::vector<juce::Label*> labels,
+                                                                const juce::String& title)
+{
+    // Module header
+    auto headerBounds = bounds.removeFromTop(14);
+    headerLabel.setBounds(headerBounds);
+    headerLabel.setText(title, juce::dontSendNotification);
+    headerLabel.setFont(juce::Font(9.0f, juce::Font::bold));
+    headerLabel.setJustificationType(juce::Justification::centred);
+    
+    // Layout 6 controls in 3x2 grid
+    const int padding = 3;
+    const int labelHeight = 8;
+    auto controlArea = bounds.reduced(padding);
+    
+    // Calculate dimensions for 3 columns, 2 rows
+    int knobWidth = controlArea.getWidth() / 3;
+    int knobHeight = (controlArea.getHeight() - labelHeight) / 2;
+    int knobSize = std::min(knobWidth - 2, knobHeight - labelHeight - 2);
+    knobSize = std::max(16, std::min(knobSize, 24)); // Smaller knobs for 6 controls
+    
+    // Position 6 controls (ensure we have exactly 6)
+    int numControls = std::min(static_cast<int>(sliders.size()), 6);
+    
+    for (int i = 0; i < numControls; ++i)
+    {
+        int col = i % 3;  // 3 columns
+        int row = i / 3;  // 2 rows
+        
+        int x = controlArea.getX() + col * knobWidth + (knobWidth - knobSize) / 2;
+        int y = controlArea.getY() + row * (knobHeight);
+        
+        if (sliders[i])
+        {
+            sliders[i]->setBounds(x, y, knobSize, knobSize);
+        }
+        
+        if (i < labels.size() && labels[i])
+        {
+            labels[i]->setBounds(x, y + knobSize + 1, knobSize, labelHeight);
+        }
+    }
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutFXModule(juce::Rectangle<int> bounds, 
+                                                          juce::Label& headerLabel,
+                                                          juce::Slider& slider1, juce::Slider& slider2,
+                                                          juce::Label& label1, juce::Label& label2,
+                                                          const juce::String& title)
+{
+    // Temporary method - will use 6-control version once all controls are added
+    // For now, use the existing 2-control layout but make it more compact
+    
+    auto headerBounds = bounds.removeFromTop(14);
+    headerLabel.setBounds(headerBounds);
+    headerLabel.setText(title, juce::dontSendNotification);
+    headerLabel.setFont(juce::Font(9.0f, juce::Font::bold));
+    headerLabel.setJustificationType(juce::Justification::centred);
+    
+    const int padding = 4;
+    const int labelHeight = 8;
+    auto controlArea = bounds.reduced(padding);
+    
+    // Make knobs smaller to prepare for 6-control layout
+    int knobSize = std::min(controlArea.getWidth() / 3 - 2, controlArea.getHeight() / 2 - labelHeight - 2);
+    knobSize = std::max(18, std::min(knobSize, 26));
+    
+    // Position first two controls in top row
+    int knobWidth = controlArea.getWidth() / 3;
+    int x1 = controlArea.getX() + (knobWidth - knobSize) / 2;
+    int x2 = controlArea.getX() + knobWidth + (knobWidth - knobSize) / 2;
+    int y = controlArea.getY();
+    
+    slider1.setBounds(x1, y, knobSize, knobSize);
+    label1.setBounds(x1, y + knobSize + 1, knobSize, labelHeight);
+    
+    slider2.setBounds(x2, y, knobSize, knobSize);
+    label2.setBounds(x2, y + knobSize + 1, knobSize, labelHeight);
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutMacroSection(juce::Rectangle<int> area)
+{
+    // Macro section header
+    auto headerArea = area.removeFromTop(22);
+    macroHeaderLabel.setText("● MACROS ●", juce::dontSendNotification);
+    macroHeaderLabel.setFont(juce::Font(11.0f, juce::Font::bold));
+    macroHeaderLabel.setJustificationType(juce::Justification::centred);
+    macroHeaderLabel.setBounds(headerArea);
+    
+    // Add spacing
+    area.removeFromTop(8);
+    
+    // Calculate clean 2x2 grid for macro controls
+    const int margin = 10;
+    const int spacing = 10;
+    const int macroWidth = (area.getWidth() - (2 * margin + spacing)) / 2;
+    const int macroHeight = (area.getHeight() - (2 * margin + spacing)) / 2;
+    
+    // Create macro bounds
+    juce::Rectangle<int> macroBounds[4] = {
+        {area.getX() + margin, area.getY() + margin, macroWidth, macroHeight},
+        {area.getX() + margin + macroWidth + spacing, area.getY() + margin, macroWidth, macroHeight},
+        {area.getX() + margin, area.getY() + margin + macroHeight + spacing, macroWidth, macroHeight},
+        {area.getX() + margin + macroWidth + spacing, area.getY() + margin + macroHeight + spacing, macroWidth, macroHeight}
+    };
+    
+    // Layout macro controls
+    layoutMacroControl(macroBounds[0], macro1Slider, macro1Label);
+    layoutMacroControl(macroBounds[1], macro2Slider, macro2Label);
+    layoutMacroControl(macroBounds[2], macro3Slider, macro3Label);
+    layoutMacroControl(macroBounds[3], macro4Slider, macro4Label);
+}
+
+void VoidTextureSynthAudioProcessorEditor::layoutMacroControl(juce::Rectangle<int> bounds, 
+                                                              juce::Slider& slider, 
+                                                              juce::Label& label)
+{
+    // Calculate optimal macro knob size
+    int knobSize = std::min(bounds.getWidth() - 12, bounds.getHeight() - 18);
+    knobSize = std::max(28, std::min(knobSize, 48));
+    
+    // Center the knob
+    int knobX = bounds.getCentreX() - knobSize/2;
+    int knobY = bounds.getY() + 3;
+    
+    slider.setBounds(knobX, knobY, knobSize, knobSize);
+    label.setBounds(bounds.getX(), knobY + knobSize + 3, bounds.getWidth(), 14);
 }
 
 void VoidTextureSynthAudioProcessorEditor::displayModeButtonClicked()
@@ -548,4 +721,243 @@ void VoidTextureSynthAudioProcessorEditor::displayModeButtonClicked()
             displayModeButton.setButtonText("Energy");
             break;
     }
+}
+
+void VoidTextureSynthAudioProcessorEditor::setupFXControls()
+{
+    // Reverb Controls
+    reverbSizeSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    reverbSizeSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    reverbSizeSlider.setRange(0.0, 1.0, 0.01);
+    reverbSizeSlider.setValue(0.5);
+    contentArea.addAndMakeVisible(reverbSizeSlider);
+    
+    reverbDampSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    reverbDampSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    reverbDampSlider.setRange(0.0, 1.0, 0.01);
+    reverbDampSlider.setValue(0.3);
+    contentArea.addAndMakeVisible(reverbDampSlider);
+    
+    reverbSizeLabel.setText("SIZE", juce::dontSendNotification);
+    reverbSizeLabel.setFont(juce::Font(10.0f, juce::Font::bold));
+    reverbSizeLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    reverbSizeLabel.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(reverbSizeLabel);
+    
+    reverbDampLabel.setText("DAMP", juce::dontSendNotification);
+    reverbDampLabel.setFont(juce::Font(10.0f, juce::Font::bold));
+    reverbDampLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    reverbDampLabel.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(reverbDampLabel);
+    
+    reverbLabel.setText("REVERB", juce::dontSendNotification);
+    reverbLabel.setFont(juce::Font(12.0f, juce::Font::bold));
+    reverbLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    reverbLabel.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(reverbLabel);
+    
+    // Delay Controls
+    delayTimeSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    delayTimeSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    delayTimeSlider.setRange(0.0, 1.0, 0.01);
+    delayTimeSlider.setValue(0.25);
+    contentArea.addAndMakeVisible(delayTimeSlider);
+    
+    delayFeedbackSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    delayFeedbackSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    delayFeedbackSlider.setRange(0.0, 0.95, 0.01);
+    delayFeedbackSlider.setValue(0.4);
+    contentArea.addAndMakeVisible(delayFeedbackSlider);
+    
+    delayTimeLabel.setText("TIME", juce::dontSendNotification);
+    delayTimeLabel.setFont(juce::Font(10.0f, juce::Font::bold));
+    delayTimeLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    delayTimeLabel.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(delayTimeLabel);
+    
+    delayFeedbackLabel.setText("FEEDBACK", juce::dontSendNotification);
+    delayFeedbackLabel.setFont(juce::Font(10.0f, juce::Font::bold));
+    delayFeedbackLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    delayFeedbackLabel.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(delayFeedbackLabel);
+    
+    delayLabel.setText("DELAY", juce::dontSendNotification);
+    delayLabel.setFont(juce::Font(12.0f, juce::Font::bold));
+    delayLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    delayLabel.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(delayLabel);
+    
+    // Distortion Controls
+    distortionDriveSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    distortionDriveSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    distortionDriveSlider.setRange(1.0, 10.0, 0.1);
+    distortionDriveSlider.setValue(2.0);
+    contentArea.addAndMakeVisible(distortionDriveSlider);
+    
+    distortionMixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    distortionMixSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    distortionMixSlider.setRange(0.0, 1.0, 0.01);
+    distortionMixSlider.setValue(0.5);
+    contentArea.addAndMakeVisible(distortionMixSlider);
+    
+    distortionLabel.setText("DISTORTION", juce::dontSendNotification);
+    distortionLabel.setFont(juce::Font(10.0f, juce::Font::bold));
+    distortionLabel.setColour(juce::Label::textColourId, juce::Colours::orange);
+    distortionLabel.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(distortionLabel);
+    
+    distortionDriveLabel.setText("DRIVE", juce::dontSendNotification);
+    distortionDriveLabel.setFont(juce::Font(10.0f, juce::Font::bold));
+    distortionDriveLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    distortionDriveLabel.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(distortionDriveLabel);
+    
+    distortionMixLabel.setText("MIX", juce::dontSendNotification);
+    distortionMixLabel.setFont(juce::Font(10.0f, juce::Font::bold));
+    distortionMixLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    distortionMixLabel.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(distortionMixLabel);
+    
+    // Filter Controls
+    filterCutoffSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    filterCutoffSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    filterCutoffSlider.setRange(20.0, 20000.0, 1.0);
+    filterCutoffSlider.setValue(1000.0);
+    filterCutoffSlider.setSkewFactorFromMidPoint(1000.0);
+    contentArea.addAndMakeVisible(filterCutoffSlider);
+    
+    filterResonanceSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    filterResonanceSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    filterResonanceSlider.setRange(0.1, 10.0, 0.1);
+    filterResonanceSlider.setValue(1.0);
+    contentArea.addAndMakeVisible(filterResonanceSlider);
+    
+    filterLabel.setText("FILTER", juce::dontSendNotification);
+    filterLabel.setFont(juce::Font(10.0f, juce::Font::bold));
+    filterLabel.setColour(juce::Label::textColourId, juce::Colours::cyan);
+    filterLabel.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(filterLabel);
+    
+    filterCutoffLabel.setText("CUTOFF", juce::dontSendNotification);
+    filterCutoffLabel.setFont(juce::Font(10.0f, juce::Font::bold));
+    filterCutoffLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    filterCutoffLabel.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(filterCutoffLabel);
+    
+    filterResonanceLabel.setText("RESO", juce::dontSendNotification);
+    filterResonanceLabel.setFont(juce::Font(10.0f, juce::Font::bold));
+    filterResonanceLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    filterResonanceLabel.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(filterResonanceLabel);
+    
+    // Setup FX header label
+    fxHeaderLabel.setText("● FX MODULES ●", juce::dontSendNotification);
+    fxHeaderLabel.setFont(juce::Font(14.0f, juce::Font::bold));
+    fxHeaderLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    fxHeaderLabel.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(fxHeaderLabel);
+    
+    // Setup Macro Controls
+    macroHeaderLabel.setText("● MACRO CONTROLS ●", juce::dontSendNotification);
+    macroHeaderLabel.setFont(juce::Font(12.0f, juce::Font::bold));
+    macroHeaderLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    macroHeaderLabel.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(macroHeaderLabel);
+    
+    // Macro 1
+    macro1Slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    macro1Slider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    macro1Slider.setRange(0.0, 1.0, 0.01);
+    macro1Slider.setValue(0.0);
+    contentArea.addAndMakeVisible(macro1Slider);
+    
+    macro1Label.setText("M1", juce::dontSendNotification);
+    macro1Label.setFont(juce::Font(9.0f, juce::Font::bold));
+    macro1Label.setColour(juce::Label::textColourId, juce::Colours::white);
+    macro1Label.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(macro1Label);
+    
+    // Macro 2
+    macro2Slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    macro2Slider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    macro2Slider.setRange(0.0, 1.0, 0.01);
+    macro2Slider.setValue(0.0);
+    contentArea.addAndMakeVisible(macro2Slider);
+    
+    macro2Label.setText("M2", juce::dontSendNotification);
+    macro2Label.setFont(juce::Font(9.0f, juce::Font::bold));
+    macro2Label.setColour(juce::Label::textColourId, juce::Colours::white);
+    macro2Label.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(macro2Label);
+    
+    // Macro 3
+    macro3Slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    macro3Slider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    macro3Slider.setRange(0.0, 1.0, 0.01);
+    macro3Slider.setValue(0.0);
+    contentArea.addAndMakeVisible(macro3Slider);
+    
+    macro3Label.setText("M3", juce::dontSendNotification);
+    macro3Label.setFont(juce::Font(9.0f, juce::Font::bold));
+    macro3Label.setColour(juce::Label::textColourId, juce::Colours::white);
+    macro3Label.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(macro3Label);
+    
+    // Macro 4
+    macro4Slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    macro4Slider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    macro4Slider.setRange(0.0, 1.0, 0.01);
+    macro4Slider.setValue(0.0);
+    contentArea.addAndMakeVisible(macro4Slider);
+    
+    macro4Label.setText("M4", juce::dontSendNotification);
+    macro4Label.setFont(juce::Font(9.0f, juce::Font::bold));
+    macro4Label.setColour(juce::Label::textColourId, juce::Colours::white);
+    macro4Label.setJustificationType(juce::Justification::centred);
+    contentArea.addAndMakeVisible(macro4Label);
+}
+
+void VoidTextureSynthAudioProcessorEditor::setFXControlsVisible(bool visible)
+{
+    // FX header
+    fxHeaderLabel.setVisible(visible);
+    
+    // Reverb controls
+    reverbSizeSlider.setVisible(visible);
+    reverbDampSlider.setVisible(visible);
+    reverbSizeLabel.setVisible(visible);
+    reverbDampLabel.setVisible(visible);
+    reverbLabel.setVisible(visible);
+    
+    // Delay controls
+    delayTimeSlider.setVisible(visible);
+    delayFeedbackSlider.setVisible(visible);
+    delayTimeLabel.setVisible(visible);
+    delayFeedbackLabel.setVisible(visible);
+    delayLabel.setVisible(visible);
+    
+    // Distortion controls
+    distortionDriveSlider.setVisible(visible);
+    distortionMixSlider.setVisible(visible);
+    distortionDriveLabel.setVisible(visible);
+    distortionMixLabel.setVisible(visible);
+    distortionLabel.setVisible(visible);
+    
+    // Filter controls
+    filterCutoffSlider.setVisible(visible);
+    filterResonanceSlider.setVisible(visible);
+    filterCutoffLabel.setVisible(visible);
+    filterResonanceLabel.setVisible(visible);
+    filterLabel.setVisible(visible);
+    
+    // Macro controls
+    macroHeaderLabel.setVisible(visible);
+    macro1Slider.setVisible(visible);
+    macro2Slider.setVisible(visible);
+    macro3Slider.setVisible(visible);
+    macro4Slider.setVisible(visible);
+    macro1Label.setVisible(visible);
+    macro2Label.setVisible(visible);
+    macro3Label.setVisible(visible);
+    macro4Label.setVisible(visible);
 }

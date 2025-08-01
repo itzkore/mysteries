@@ -455,15 +455,23 @@ void SynthEngine1Panel::resized()
     auto enableBounds = oscRowBounds.removeFromLeft(enableWidth);
     enableBounds = enableBounds.withY(oscillatorLabel.getBottom() + 10);
     oscillatorEnable.setBounds(enableBounds);
-    // Settings and randomize buttons for oscillator
+    // Settings and randomize buttons for oscillator - positioned over enable checkbox
     if (oscillatorSettingsButton)
-        oscillatorSettingsButton->setBounds(enableBounds.getRight() + 5,
-                                           enableBounds.getY(),
-                                           18, 18);
+    {
+        oscillatorSettingsButton->setBounds(enableBounds.getX() - 30,
+                                           enableBounds.getY() - 25,
+                                           20, 20);
+        oscillatorSettingsButton->setTooltip("Oscillator layer settings");
+    }
     if (oscillatorRandomizeButton)
-        oscillatorRandomizeButton->setBounds(enableBounds.getRight() + 25,
-                                             enableBounds.getY(),
-                                             18, 18);
+    {
+        oscillatorRandomizeButton->setBounds(enableBounds.getX() - 7,
+                                             enableBounds.getY() - 25,
+                                             20, 20);
+        oscillatorRandomizeButton->setTooltip("Randomize oscillator parameters");
+        oscillatorRandomizeButton->setColour(juce::TextButton::buttonColourId, juce::Colour(0xFF444444));
+        oscillatorRandomizeButton->setColour(juce::TextButton::textColourOnId, juce::Colours::orange);
+    }
     
     // Level control with label - ensure there's enough room for interaction
     auto levelBounds = oscRowBounds.removeFromLeft(controlWidth).reduced(2);
@@ -514,6 +522,24 @@ void SynthEngine1Panel::resized()
     subEnableBounds = subEnableBounds.withY(subLabel.getBottom() + 10);
     subEnable.setBounds(subEnableBounds);
     
+    // Settings and randomize buttons for sub oscillator - positioned over enable checkbox
+    if (subSettingsButton)
+    {
+        subSettingsButton->setBounds(subEnableBounds.getX() - 30,
+                                    subEnableBounds.getY() - 25,
+                                    20, 20);
+        subSettingsButton->setTooltip("Sub oscillator layer settings");
+    }
+    if (subRandomizeButton)
+    {
+        subRandomizeButton->setBounds(subEnableBounds.getX() - 7,
+                                     subEnableBounds.getY() - 25,
+                                     20, 20);
+        subRandomizeButton->setTooltip("Randomize sub oscillator parameters");
+        subRandomizeButton->setColour(juce::TextButton::buttonColourId, juce::Colour(0xFF444444));
+        subRandomizeButton->setColour(juce::TextButton::textColourOnId, juce::Colours::red);
+    }
+    
     // Level control with label
     auto subLevelBounds = subRowBounds.removeFromLeft(controlWidth).reduced(2);
     subLevelLabel.setBounds(subLevelBounds.removeFromTop(labelHeight));
@@ -555,6 +581,24 @@ void SynthEngine1Panel::resized()
     noiseEnableBounds = noiseEnableBounds.withY(noiseLabel.getBottom() + 10);
     noiseEnable.setBounds(noiseEnableBounds);
     
+    // Settings and randomize buttons for noise layer - positioned over enable checkbox
+    if (noiseSettingsButton)
+    {
+        noiseSettingsButton->setBounds(noiseEnableBounds.getX() - 30,
+                                      noiseEnableBounds.getY() - 25,
+                                      20, 20);
+        noiseSettingsButton->setTooltip("Noise layer settings");
+    }
+    if (noiseRandomizeButton)
+    {
+        noiseRandomizeButton->setBounds(noiseEnableBounds.getX() - 7,
+                                       noiseEnableBounds.getY() - 25,
+                                       20, 20);
+        noiseRandomizeButton->setTooltip("Randomize noise parameters");
+        noiseRandomizeButton->setColour(juce::TextButton::buttonColourId, juce::Colour(0xFF444444));
+        noiseRandomizeButton->setColour(juce::TextButton::textColourOnId, juce::Colours::yellow);
+    }
+    
     // Level control with label
     auto noiseLevelBounds = noiseRowBounds.removeFromLeft(controlWidth).reduced(2);
     noiseLevelLabel.setBounds(noiseLevelBounds.removeFromTop(labelHeight));
@@ -595,6 +639,24 @@ void SynthEngine1Panel::resized()
     auto samplerEnableBounds = samplerRowBounds.removeFromLeft(enableWidth);
     samplerEnableBounds = samplerEnableBounds.withY(samplerLabel.getBottom() + 10);
     samplerEnable.setBounds(samplerEnableBounds);
+    
+    // Settings and randomize buttons for sampler layer - positioned over enable checkbox
+    if (samplerSettingsButton)
+    {
+        samplerSettingsButton->setBounds(samplerEnableBounds.getX() - 30,
+                                        samplerEnableBounds.getY() - 25,
+                                        20, 20);
+        samplerSettingsButton->setTooltip("Sampler layer settings");
+    }
+    if (samplerRandomizeButton)
+    {
+        samplerRandomizeButton->setBounds(samplerEnableBounds.getX() - 7,
+                                         samplerEnableBounds.getY() - 25,
+                                         20, 20);
+        samplerRandomizeButton->setTooltip("Randomize sampler parameters");
+        samplerRandomizeButton->setColour(juce::TextButton::buttonColourId, juce::Colour(0xFF444444));
+        samplerRandomizeButton->setColour(juce::TextButton::textColourOnId, juce::Colours::lime);
+    }
     
     // Level control with label
     auto samplerLevelBounds = samplerRowBounds.removeFromLeft(controlWidth).reduced(2);

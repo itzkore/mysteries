@@ -91,10 +91,10 @@ private:
     //==============================================================================
     // Visual parameters
     DisplayMode currentMode = DisplayMode::Energy;
-    // Base orb color with increased transparency
-    juce::Colour orbColor = juce::Colour(0x554A90E2);       // Base orb color (33% opacity)
-    // Glow effect color with increased transparency
-    juce::Colour glowColor = juce::Colour(0x40007BFF);      // Glow effect color (25% opacity)
+    // Base orb color with dark grey purple tone
+    juce::Colour orbColor = juce::Colour(0x55534463);       // Dark grey purple (33% opacity)
+    // Glow effect color with dark purple tone
+    juce::Colour glowColor = juce::Colour(0x40483D5A);      // Dark purple glow (25% opacity)
     juce::Colour backgroundColor = juce::Colour(0xFF0A0A0F); // Background color
     
     float rotationSpeed = 0.5f;        // How fast the orb rotates

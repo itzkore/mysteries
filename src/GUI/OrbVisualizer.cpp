@@ -166,7 +166,7 @@ void OrbVisualizer::timerCallback()
 
 void OrbVisualizer::pushAudioData(const float* audioData, int numSamples)
 {
-    if (numSamples <= 0) 
+    if (numSamples <= 0 || !audioData) 
         return;
     
     // Calculate energy from this audio chunk
@@ -184,15 +184,19 @@ void OrbVisualizer::pushAudioData(const float* audioData, int numSamples)
     if (currentEnergy > peakEnergy)
         peakEnergy = currentEnergy;
     
-    // Copy data to the buffer
+    // Copy data to the buffer with bounds checking
     const int samplesToUse = std::min(numSamples, bufferSize);
     for (int i = 0; i < samplesToUse; ++i)
     {
         const int writeIndex = (writePos + i) % bufferSize;
-        audioBuffer[writeIndex] = audioData[i];
-        
-        // Also store energy history
-        energyHistory[writeIndex] = energy;
+        if (writeIndex >= 0 && writeIndex < bufferSize)
+        {
+            audioBuffer[writeIndex] = audioData[i];
+            
+            // Also store energy history with bounds check
+            if (writeIndex < static_cast<int>(energyHistory.size()))
+                energyHistory[writeIndex] = energy;
+        }
     }
     writePos = (writePos + samplesToUse) % bufferSize;
     
@@ -286,22 +290,36 @@ void OrbVisualizer::setBackgroundColor(juce::Colour bgColor)
 
 void OrbVisualizer::calculateSpectrum()
 {
-    // Copy audio data to FFT buffer
+    // Safety check for buffer sizes
+    if (writePos < 0 || writePos >= bufferSize)
+        writePos = 0;
+    
+    // Copy audio data to FFT buffer with bounds checking
     int readPos = (writePos - fftSize + bufferSize) % bufferSize;
     for (int i = 0; i < fftSize; ++i)
     {
-        fftData[i * 2] = audioBuffer[(readPos + i) % bufferSize];
-        fftData[i * 2 + 1] = 0.0f; // Imaginary part
+        int bufferIndex = (readPos + i) % bufferSize;
+        if (bufferIndex >= 0 && bufferIndex < bufferSize)
+        {
+            fftData[i * 2] = audioBuffer[bufferIndex];
+            fftData[i * 2 + 1] = 0.0f; // Imaginary part
+        }
+        else
+        {
+            fftData[i * 2] = 0.0f;
+            fftData[i * 2 + 1] = 0.0f;
+        }
     }
     
-    // Apply windowing function
-    window.multiplyWithWindowingTable(fftData.data(), fftSize);
+    // Apply windowing function with safety check
+    if (fftData.size() >= fftSize * 2)
+        window.multiplyWithWindowingTable(fftData.data(), fftSize);
     
     // Perform FFT
     fft.performFrequencyOnlyForwardTransform(fftData.data());
     
-    // Convert to spectrum data with some smoothing
-    for (int i = 0; i < numBins; ++i)
+    // Convert to spectrum data with some smoothing and bounds checking
+    for (int i = 0; i < numBins && i < static_cast<int>(spectrumData.size()) && i < static_cast<int>(fftData.size()); ++i)
     {
         const float newValue = fftData[i];
         spectrumData[i] = spectrumData[i] * 0.7f + newValue * 0.3f;
@@ -314,8 +332,11 @@ void OrbVisualizer::updateParticles()
     const float centerX = bounds.getCentreX();
     const float centerY = bounds.getCentreY();
     
+    // Safety clamp for activeParticles
+    activeParticles = juce::jlimit(0, maxParticles, activeParticles);
+    
     // Update existing particles
-    for (int i = 0; i < activeParticles; ++i)
+    for (int i = 0; i < activeParticles && i < maxParticles; ++i)
     {
         auto& p = particles[i];
         
@@ -323,63 +344,60 @@ void OrbVisualizer::updateParticles()
         p.x += p.vx;
         p.y += p.vy;
         
-        // Apply gravity towards center
-        const float dx = centerX - p.x;
-        const float dy = centerY - p.y;
-        const float distSq = dx * dx + dy * dy;
-        if (distSq > 1.0f)
-        {
-            const float dist = std::sqrt(distSq);
-            const float force = 0.01f / dist;
-            p.vx += dx * force;
-            p.vy += dy * force;
-        }
+        // Apply upward drift for smoke effect instead of gravity
+        p.vy -= 0.015f; // Upward drift
         
-        // Dampen velocity
-        p.vx *= 0.98f;
-        p.vy *= 0.98f;
+        // Horizontal dispersion and dampening
+        p.vx *= 0.985f;
+        p.vy *= 0.99f;
         
-        // Decay life
-        p.life -= 0.01f;
+        // Decay life slower for more visible smoke
+        p.life -= 0.008f;
         
-        // Update color alpha based on life
-        p.color = p.color.withAlpha(p.life * p.life * 0.8f);
+        // Update color alpha based on life with softer fade
+        p.color = p.color.withAlpha(p.life * 0.6f);
         
-        // Shrink as life depletes
-        p.size = p.size * 0.99f;
+        // Grow slightly as life depletes (smoke expansion)
+        p.size = p.size * 1.002f;
     }
     
-    // Remove dead particles
-    for (int i = 0; i < activeParticles; ++i)
+    // Remove dead particles with safety checks
+    for (int i = 0; i < activeParticles && i < maxParticles; ++i)
     {
         if (particles[i].life <= 0.0f)
         {
             // Replace with the last active particle
-            if (i < activeParticles - 1)
+            if (i < activeParticles - 1 && activeParticles > 1 && (activeParticles - 1) < maxParticles)
                 particles[i] = particles[activeParticles - 1];
             
             // Decrease active count
             --activeParticles;
             --i; // Check the same index again
+            
+            // Safety clamp
+            activeParticles = juce::jlimit(0, maxParticles, activeParticles);
         }
     }
 }
 
 void OrbVisualizer::emitParticles(int count)
 {
-    if (activeParticles >= maxParticles)
+    if (activeParticles >= maxParticles || count <= 0)
         return;
     
     const auto bounds = getLocalBounds().toFloat();
+    if (bounds.isEmpty())
+        return;
+        
     const float centerX = bounds.getCentreX();
     const float centerY = bounds.getCentreY();
     const float radius = std::min(bounds.getWidth(), bounds.getHeight()) * 0.35f;
     
-    const int numToEmit = std::min(count, maxParticles - activeParticles);
+    const int numToEmit = juce::jlimit(0, maxParticles - activeParticles, count);
     
     for (int i = 0; i < numToEmit; ++i)
     {
-        // Find an inactive particle
+        // Find an inactive particle with bounds checking
         if (activeParticles < maxParticles)
         {
             auto& p = particles[activeParticles++];
@@ -392,14 +410,14 @@ void OrbVisualizer::emitParticles(int count)
             p.x = centerX + std::cos(angle) * distance;
             p.y = centerY + std::sin(angle) * distance;
             
-            // Random velocity away from center
-            const float speed = 0.5f + juce::Random::getSystemRandom().nextFloat() * 1.5f;
-            p.vx = std::cos(angle) * speed;
-            p.vy = std::sin(angle) * speed;
+            // Random velocity away from center - upward bias for smoke effect
+            const float speed = 0.3f + juce::Random::getSystemRandom().nextFloat() * 0.8f;
+            p.vx = std::cos(angle) * speed * 0.3f; // Reduced horizontal drift
+            p.vy = -speed * (0.8f + juce::Random::getSystemRandom().nextFloat() * 0.4f); // Upward motion
             
-            // Random life and size
-            p.life = 0.5f + juce::Random::getSystemRandom().nextFloat() * 0.5f;
-            p.size = 2.0f + juce::Random::getSystemRandom().nextFloat() * 3.0f;
+            // Random life and size for smoke particles
+            p.life = 0.8f + juce::Random::getSystemRandom().nextFloat() * 0.4f;
+            p.size = 1.5f + juce::Random::getSystemRandom().nextFloat() * 2.5f;
             
             // Color based on the orb color with variation
             const float hue = orbColor.getHue();

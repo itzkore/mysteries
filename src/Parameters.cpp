@@ -27,6 +27,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
     params.push_back(std::make_unique<juce::AudioParameterFloat>("macroGhost", "Ghost", 0.0f, 1.0f, 0.5f));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("macroHeat", "Heat", 0.0f, 1.0f, 0.5f));
     
+    // Main Tab Macro Controls - 4 macro controls for the main interface
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("macro1", "Macro 1", 0.0f, 1.0f, 0.0f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("macro2", "Macro 2", 0.0f, 1.0f, 0.0f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("macro3", "Macro 3", 0.0f, 1.0f, 0.0f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("macro4", "Macro 4", 0.0f, 1.0f, 0.0f));
+    
     // Synth Engine 1 Layer Parameters - Enabled by default for ambient pads
     // Oscillator Layer
     params.push_back(std::make_unique<juce::AudioParameterBool>("osc1Enable", "Oscillator Enable", true));
