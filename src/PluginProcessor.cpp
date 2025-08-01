@@ -3,7 +3,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "Parameters.h"
-#include "GUI/WaveformDisplay.h"
+#include "GUI/OrbVisualizer.h"
 
 void VoidTextureSynthAudioProcessor::setOscPreset(int idx)
 {
@@ -170,11 +170,21 @@ void VoidTextureSynthAudioProcessor::processBlock (juce::AudioBuffer<float>& buf
         {
             midiNote = msg.getNoteNumber();
             oscPhase = 0.0f;
+            
+            // Update MIDI activity status
+            isNoteActive = true;
+            currentMidiVelocity = msg.getFloatVelocity(); // normalized 0-1
         }
         else if (msg.isNoteOff())
         {
             if (msg.getNoteNumber() == midiNote)
+            {
                 midiNote = -1;
+                
+                // Update MIDI activity status
+                isNoteActive = false;
+                // Don't reset velocity here - let it decay naturally in the visualizer
+            }
         }
     }
 
@@ -217,7 +227,11 @@ void VoidTextureSynthAudioProcessor::processBlock (juce::AudioBuffer<float>& buf
     // Update waveform display if connected
     if (currentWaveformDisplay != nullptr)
     {
+        // Send audio data to visualizer
         currentWaveformDisplay->pushAudioData(buffer);
+        
+        // Send MIDI activity status to visualizer
+        currentWaveformDisplay->setMidiActivity(isNoteActive, currentMidiVelocity);
     }
 }
 

@@ -61,6 +61,8 @@ target_sources(VoidTextureSynth PRIVATE
     src/GUI/SynthEngine1Panel.h
     src/GUI/WaveformDisplay.cpp
     src/GUI/WaveformDisplay.h
+    src/GUI/OrbVisualizer.cpp
+    src/GUI/OrbVisualizer.h
     src/DSP/VoidOscillator.cpp
     src/DSP/DarkFilter.cpp
     src/DSP/SynthVoice.cpp

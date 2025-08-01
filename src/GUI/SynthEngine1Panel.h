@@ -18,9 +18,17 @@ private:
     
     // Layer Enable/Disable Toggles
     juce::ToggleButton oscillatorEnable;
+    std::unique_ptr<juce::TextButton> oscillatorSettingsButton;
+    std::unique_ptr<juce::TextButton> oscillatorRandomizeButton;
     juce::ToggleButton subEnable;
+    std::unique_ptr<juce::TextButton> subSettingsButton;
+    std::unique_ptr<juce::TextButton> subRandomizeButton;
     juce::ToggleButton noiseEnable;
+    std::unique_ptr<juce::TextButton> noiseSettingsButton;
+    std::unique_ptr<juce::TextButton> noiseRandomizeButton;
     juce::ToggleButton samplerEnable;
+    std::unique_ptr<juce::TextButton> samplerSettingsButton;
+    std::unique_ptr<juce::TextButton> samplerRandomizeButton;
     
     // Layer Level Controls
     juce::Slider oscillatorLevel;

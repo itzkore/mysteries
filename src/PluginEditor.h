@@ -2,7 +2,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "PluginProcessor.h"
 #include "GUI/SynthEngine1Panel.h"
-#include "GUI/WaveformDisplay.h"
+#include "GUI/OrbVisualizer.h"
+#include "GUI/VoidLookAndFeel.h"
 
 //==============================================================================
 class VoidTextureSynthAudioProcessorEditor : public juce::AudioProcessorEditor,
@@ -32,14 +33,22 @@ private:
     juce::Label volumeLabel;
     juce::Label synth2Label;
     
+    // FX section labels
+    juce::Label fxLabel;
+    juce::Label reverbLabel;
+    juce::Label delayLabel;
+    
     // Main panel components
-    std::unique_ptr<WaveformDisplay> waveformDisplay;
+    std::unique_ptr<OrbVisualizer> waveformDisplay;
     juce::TextButton displayModeButton;
     
     // Advanced panels
     std::unique_ptr<SynthEngine1Panel> synthEngine1Panel;
     
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> volumeAttachment;
+    
+    // Custom look and feel for cosmic aesthetic
+    VoidLookAndFeel voidLookAndFeel;
     
     int currentTab = 0;
     

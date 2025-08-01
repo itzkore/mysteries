@@ -6,7 +6,7 @@
 #include "Engines/SynthEngine1.h"
 
 // Forward declarations
-class WaveformDisplay;
+class OrbVisualizer;
 
 //==============================================================================
 class VoidTextureSynthAudioProcessor : public juce::AudioProcessor
@@ -17,8 +17,13 @@ public:
     SynthEngine1 synthEngine1; // Instantiate SynthEngine1
     
     // Audio visualization
-    WaveformDisplay* currentWaveformDisplay = nullptr;
-    void setWaveformDisplay(WaveformDisplay* display) { currentWaveformDisplay = display; }
+    OrbVisualizer* currentWaveformDisplay = nullptr;
+    void setWaveformDisplay(OrbVisualizer* display) { currentWaveformDisplay = display; }
+    
+    // MIDI activity tracking
+    bool isNoteActive = false;
+    float currentMidiVelocity = 0.0f;
+    
     // --- Oscillator engine state ---
     float currentSampleRate = 44100.0f;
     float oscPhase = 0.0f;

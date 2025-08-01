@@ -159,6 +159,16 @@ void SynthEngine1Panel::setupLayerControls()
     oscillatorLevel.setColour(juce::Slider::textBoxOutlineColourId, juce::Colour(0x33FFFFFF));
     oscillatorLevel.setTooltip("Oscillator Level");
     addAndMakeVisible(oscillatorLevel);
+    // Tools button for oscillator layer
+    oscillatorSettingsButton = std::make_unique<juce::TextButton>("⚙");
+    oscillatorSettingsButton->setTooltip("Oscillator settings");
+    oscillatorSettingsButton->setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
+    addAndMakeVisible(*oscillatorSettingsButton);
+    // Randomize button for oscillator layer
+    oscillatorRandomizeButton = std::make_unique<juce::TextButton>("R");
+    oscillatorRandomizeButton->setTooltip("Randomize oscillator parameters");
+    oscillatorRandomizeButton->setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
+    addAndMakeVisible(*oscillatorRandomizeButton);
     
     oscillatorPan.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     oscillatorPan.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
@@ -207,6 +217,16 @@ void SynthEngine1Panel::setupLayerControls()
     subEnable.setColour(juce::ToggleButton::textColourId, juce::Colours::white);
     subEnable.setTooltip("Enable/Disable Sub Oscillator Layer");
     addAndMakeVisible(subEnable);
+    // Tools button for sub oscillator layer
+    subSettingsButton = std::make_unique<juce::TextButton>("⚙");
+    subSettingsButton->setTooltip("Sub oscillator settings");
+    subSettingsButton->setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
+    addAndMakeVisible(*subSettingsButton);
+    // Randomize button for sub oscillator layer
+    subRandomizeButton = std::make_unique<juce::TextButton>("R");
+    subRandomizeButton->setTooltip("Randomize sub oscillator parameters");
+    subRandomizeButton->setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
+    addAndMakeVisible(*subRandomizeButton);
     
     subLevel.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     subLevel.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
@@ -248,6 +268,16 @@ void SynthEngine1Panel::setupLayerControls()
     noiseEnable.setButtonText("");
     noiseEnable.setColour(juce::ToggleButton::tickColourId, juce::Colours::yellow);
     addAndMakeVisible(noiseEnable);
+    // Tools button for noise generator layer
+    noiseSettingsButton = std::make_unique<juce::TextButton>("⚙");
+    noiseSettingsButton->setTooltip("Noise generator settings");
+    noiseSettingsButton->setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
+    addAndMakeVisible(*noiseSettingsButton);
+    // Randomize button for noise generator layer
+    noiseRandomizeButton = std::make_unique<juce::TextButton>("R");
+    noiseRandomizeButton->setTooltip("Randomize noise generator parameters");
+    noiseRandomizeButton->setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
+    addAndMakeVisible(*noiseRandomizeButton);
     
     noiseLevel.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     noiseLevel.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
@@ -297,6 +327,16 @@ void SynthEngine1Panel::setupLayerControls()
     samplerEnable.setColour(juce::ToggleButton::textColourId, juce::Colours::white);
     samplerEnable.setTooltip("Enable/Disable Sampler Layer");
     addAndMakeVisible(samplerEnable);
+    // Tools button for sampler layer
+    samplerSettingsButton = std::make_unique<juce::TextButton>("⚙");
+    samplerSettingsButton->setTooltip("Sampler settings");
+    samplerSettingsButton->setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
+    addAndMakeVisible(*samplerSettingsButton);
+    // Randomize button for sampler layer
+    samplerRandomizeButton = std::make_unique<juce::TextButton>("R");
+    samplerRandomizeButton->setTooltip("Randomize sampler parameters");
+    samplerRandomizeButton->setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
+    addAndMakeVisible(*samplerRandomizeButton);
     
     samplerLevel.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     samplerLevel.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
@@ -397,11 +437,11 @@ void SynthEngine1Panel::resized()
     // Main section label at top
     sectionLabel.setBounds(bounds.removeFromTop(50).reduced(10));
     
-    // Layout for each layer - vertical stack with each layer taking more space
+    // Layout for each layer - vertical stack with improved control spacing
     const int layerHeight = 140;
     const int controlHeight = 100;
     const int controlWidth = 80;
-    const int padding = 10;
+    const int padding = 15; // Increased padding for better spacing
     const int labelHeight = 20;
     const int enableWidth = 50;
     
@@ -412,26 +452,37 @@ void SynthEngine1Panel::resized()
     auto oscRowBounds = oscSectionBounds.reduced(padding, 0);
     
     // Position each control with spacing
-    oscillatorEnable.setBounds(oscRowBounds.removeFromLeft(enableWidth).withY(oscillatorLabel.getBottom() + 10));
+    auto enableBounds = oscRowBounds.removeFromLeft(enableWidth);
+    enableBounds = enableBounds.withY(oscillatorLabel.getBottom() + 10);
+    oscillatorEnable.setBounds(enableBounds);
+    // Settings and randomize buttons for oscillator
+    if (oscillatorSettingsButton)
+        oscillatorSettingsButton->setBounds(enableBounds.getRight() + 5,
+                                           enableBounds.getY(),
+                                           18, 18);
+    if (oscillatorRandomizeButton)
+        oscillatorRandomizeButton->setBounds(enableBounds.getRight() + 25,
+                                             enableBounds.getY(),
+                                             18, 18);
     
-    // Level control with label
-    auto levelBounds = oscRowBounds.removeFromLeft(controlWidth);
+    // Level control with label - ensure there's enough room for interaction
+    auto levelBounds = oscRowBounds.removeFromLeft(controlWidth).reduced(2);
     oscLevelLabel.setBounds(levelBounds.removeFromTop(labelHeight));
-    oscillatorLevel.setBounds(levelBounds);
+    oscillatorLevel.setBounds(levelBounds.reduced(0, 2));
     
     // Add spacing
     oscRowBounds.removeFromLeft(padding);
     
-    // Pan control with label
-    auto panBounds = oscRowBounds.removeFromLeft(controlWidth);
+    // Pan control with label - ensure there's enough room for interaction
+    auto panBounds = oscRowBounds.removeFromLeft(controlWidth).reduced(2);
     oscPanLabel.setBounds(panBounds.removeFromTop(labelHeight));
-    oscillatorPan.setBounds(panBounds);
+    oscillatorPan.setBounds(panBounds.reduced(0, 2));
     
     // Add spacing
     oscRowBounds.removeFromLeft(padding);
     
     // Waveform combo box with label
-    auto waveformBounds = oscRowBounds.removeFromLeft(controlWidth + 20);
+    auto waveformBounds = oscRowBounds.removeFromLeft(controlWidth + 20).reduced(2);
     oscWaveformLabel.setBounds(waveformBounds.removeFromTop(labelHeight));
     oscillatorWaveform.setBounds(waveformBounds.removeFromTop(30));
     
@@ -439,17 +490,17 @@ void SynthEngine1Panel::resized()
     oscRowBounds.removeFromLeft(padding);
     
     // Detune control with label
-    auto detuneBounds = oscRowBounds.removeFromLeft(controlWidth);
+    auto detuneBounds = oscRowBounds.removeFromLeft(controlWidth).reduced(2);
     oscDetuneLabel.setBounds(detuneBounds.removeFromTop(labelHeight));
-    oscillatorDetune.setBounds(detuneBounds);
+    oscillatorDetune.setBounds(detuneBounds.reduced(0, 2));
     
     // Add spacing
     oscRowBounds.removeFromLeft(padding);
     
     // Octave control with label
-    auto octaveBounds = oscRowBounds.removeFromLeft(controlWidth);
+    auto octaveBounds = oscRowBounds.removeFromLeft(controlWidth).reduced(2);
     oscOctaveLabel.setBounds(octaveBounds.removeFromTop(labelHeight));
-    oscillatorOctave.setBounds(octaveBounds);
+    oscillatorOctave.setBounds(octaveBounds.reduced(0, 2));
     
     // SUB OSCILLATOR LAYER SECTION
     bounds.removeFromTop(10); // spacing between sections
@@ -459,26 +510,28 @@ void SynthEngine1Panel::resized()
     auto subRowBounds = subSectionBounds.reduced(padding, 0);
     
     // Position each control with spacing
-    subEnable.setBounds(subRowBounds.removeFromLeft(enableWidth).withY(subLabel.getBottom() + 10));
+    auto subEnableBounds = subRowBounds.removeFromLeft(enableWidth);
+    subEnableBounds = subEnableBounds.withY(subLabel.getBottom() + 10);
+    subEnable.setBounds(subEnableBounds);
     
     // Level control with label
-    auto subLevelBounds = subRowBounds.removeFromLeft(controlWidth);
+    auto subLevelBounds = subRowBounds.removeFromLeft(controlWidth).reduced(2);
     subLevelLabel.setBounds(subLevelBounds.removeFromTop(labelHeight));
-    subLevel.setBounds(subLevelBounds);
+    subLevel.setBounds(subLevelBounds.reduced(0, 2));
     
     // Add spacing
     subRowBounds.removeFromLeft(padding);
     
     // Pan control with label
-    auto subPanBounds = subRowBounds.removeFromLeft(controlWidth);
+    auto subPanBounds = subRowBounds.removeFromLeft(controlWidth).reduced(2);
     subPanLabel.setBounds(subPanBounds.removeFromTop(labelHeight));
-    subPan.setBounds(subPanBounds);
+    subPan.setBounds(subPanBounds.reduced(0, 2));
     
     // Add spacing
     subRowBounds.removeFromLeft(padding);
     
     // Waveform combo box with label
-    auto subWaveformBounds = subRowBounds.removeFromLeft(controlWidth + 20);
+    auto subWaveformBounds = subRowBounds.removeFromLeft(controlWidth + 20).reduced(2);
     subWaveformLabel.setBounds(subWaveformBounds.removeFromTop(labelHeight));
     subWaveform.setBounds(subWaveformBounds.removeFromTop(30));
     
@@ -486,9 +539,9 @@ void SynthEngine1Panel::resized()
     subRowBounds.removeFromLeft(padding);
     
     // Octave control with label
-    auto subOctaveBounds = subRowBounds.removeFromLeft(controlWidth);
+    auto subOctaveBounds = subRowBounds.removeFromLeft(controlWidth).reduced(2);
     subOctaveLabel.setBounds(subOctaveBounds.removeFromTop(labelHeight));
-    subOctaveOffset.setBounds(subOctaveBounds);
+    subOctaveOffset.setBounds(subOctaveBounds.reduced(0, 2));
     
     // NOISE LAYER SECTION
     bounds.removeFromTop(10); // spacing between sections
@@ -498,26 +551,28 @@ void SynthEngine1Panel::resized()
     auto noiseRowBounds = noiseSectionBounds.reduced(padding, 0);
     
     // Position each control with spacing
-    noiseEnable.setBounds(noiseRowBounds.removeFromLeft(enableWidth).withY(noiseLabel.getBottom() + 10));
+    auto noiseEnableBounds = noiseRowBounds.removeFromLeft(enableWidth);
+    noiseEnableBounds = noiseEnableBounds.withY(noiseLabel.getBottom() + 10);
+    noiseEnable.setBounds(noiseEnableBounds);
     
     // Level control with label
-    auto noiseLevelBounds = noiseRowBounds.removeFromLeft(controlWidth);
+    auto noiseLevelBounds = noiseRowBounds.removeFromLeft(controlWidth).reduced(2);
     noiseLevelLabel.setBounds(noiseLevelBounds.removeFromTop(labelHeight));
-    noiseLevel.setBounds(noiseLevelBounds);
+    noiseLevel.setBounds(noiseLevelBounds.reduced(0, 2));
     
     // Add spacing
     noiseRowBounds.removeFromLeft(padding);
     
     // Pan control with label
-    auto noisePanBounds = noiseRowBounds.removeFromLeft(controlWidth);
+    auto noisePanBounds = noiseRowBounds.removeFromLeft(controlWidth).reduced(2);
     noisePanLabel.setBounds(noisePanBounds.removeFromTop(labelHeight));
-    noisePan.setBounds(noisePanBounds);
+    noisePan.setBounds(noisePanBounds.reduced(0, 2));
     
     // Add spacing
     noiseRowBounds.removeFromLeft(padding);
     
     // Type combo box with label
-    auto noiseTypeBounds = noiseRowBounds.removeFromLeft(controlWidth + 20);
+    auto noiseTypeBounds = noiseRowBounds.removeFromLeft(controlWidth + 20).reduced(2);
     noiseTypeLabel.setBounds(noiseTypeBounds.removeFromTop(labelHeight));
     noiseType.setBounds(noiseTypeBounds.removeFromTop(30));
     
@@ -525,9 +580,9 @@ void SynthEngine1Panel::resized()
     noiseRowBounds.removeFromLeft(padding);
     
     // Filter control with label
-    auto noiseFilterBounds = noiseRowBounds.removeFromLeft(controlWidth);
+    auto noiseFilterBounds = noiseRowBounds.removeFromLeft(controlWidth).reduced(2);
     noiseFilterLabel.setBounds(noiseFilterBounds.removeFromTop(labelHeight));
-    noiseFilterCutoff.setBounds(noiseFilterBounds);
+    noiseFilterCutoff.setBounds(noiseFilterBounds.reduced(0, 2));
     
     // SAMPLER LAYER SECTION
     bounds.removeFromTop(10); // spacing between sections
@@ -537,18 +592,20 @@ void SynthEngine1Panel::resized()
     auto samplerRowBounds = samplerSectionBounds.reduced(padding, 0);
     
     // Position each control with spacing
-    samplerEnable.setBounds(samplerRowBounds.removeFromLeft(enableWidth).withY(samplerLabel.getBottom() + 10));
+    auto samplerEnableBounds = samplerRowBounds.removeFromLeft(enableWidth);
+    samplerEnableBounds = samplerEnableBounds.withY(samplerLabel.getBottom() + 10);
+    samplerEnable.setBounds(samplerEnableBounds);
     
     // Level control with label
-    auto samplerLevelBounds = samplerRowBounds.removeFromLeft(controlWidth);
+    auto samplerLevelBounds = samplerRowBounds.removeFromLeft(controlWidth).reduced(2);
     samplerLevelLabel.setBounds(samplerLevelBounds.removeFromTop(labelHeight));
-    samplerLevel.setBounds(samplerLevelBounds);
+    samplerLevel.setBounds(samplerLevelBounds.reduced(0, 2));
     
     // Add spacing
     samplerRowBounds.removeFromLeft(padding);
     
     // Pan control with label
-    auto samplerPanBounds = samplerRowBounds.removeFromLeft(controlWidth);
+    auto samplerPanBounds = samplerRowBounds.removeFromLeft(controlWidth).reduced(2);
     samplerPanLabel.setBounds(samplerPanBounds.removeFromTop(labelHeight));
-    samplerPan.setBounds(samplerPanBounds);
+    samplerPan.setBounds(samplerPanBounds.reduced(0, 2));
 }
